@@ -1,0 +1,5552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>VOIDFALL 2.0 — Cinematic Edition</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#02040a;
+    color:#eaf7ff;
+    font-family:Segoe UI,Arial,sans-serif;
+}
+canvas{
+    display:block;
+    width:100vw;
+    height:100vh;
+    cursor:crosshair;
+}
+
+/* BOOT */
+#boot{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        radial-gradient(circle at 50% 42%,#172b48 0,#07101d 35%,#020307 78%);
+}
+.bootBox{
+    width:min(760px,90vw);
+    text-align:center;
+    padding:45px;
+    border:1px solid #314960;
+    background:rgba(3,7,15,.9);
+    box-shadow:0 0 100px #000;
+}
+.logo{
+    margin:0;
+    font-size:clamp(45px,8vw,100px);
+    font-weight:900;
+    letter-spacing:.16em;
+    color:#dffaff;
+    text-shadow:
+        0 0 15px #65e4ff,
+        0 0 40px #2f8cff,
+        0 0 90px #2854ff;
+}
+.sub{
+    margin:8px 0 35px;
+    letter-spacing:.45em;
+    color:#91aabd;
+}
+.bootBar{
+    height:4px;
+    background:#111d2b;
+    overflow:hidden;
+}
+.bootBar i{
+    display:block;
+    width:0;
+    height:100%;
+    background:#8deaff;
+    box-shadow:0 0 20px #5bdcff;
+    animation:loading 2s forwards;
+}
+.bootText{
+    margin-top:15px;
+    color:#637b91;
+    font-size:11px;
+    letter-spacing:.2em;
+}
+@keyframes loading{
+    to{width:100%}
+}
+
+/* LOGIN */
+#login{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:90;
+    align-items:center;
+    justify-content:center;
+    background:rgba(1,3,8,.82);
+    backdrop-filter:blur(10px);
+}
+.loginPanel{
+    width:min(600px,92vw);
+    padding:38px;
+    background:
+        linear-gradient(145deg,rgba(13,23,38,.98),rgba(3,7,14,.98));
+    border:1px solid #36506a;
+    box-shadow:0 30px 120px #000;
+}
+.loginPanel h1{
+    margin:0;
+    font-size:34px;
+    letter-spacing:.12em;
+}
+.loginPanel .subtitle{
+    color:#6f879c;
+    margin:5px 0 25px;
+    letter-spacing:.25em;
+}
+.warning{
+    margin:10px 0;
+    padding:14px;
+    border:1px solid #655333;
+    background:rgba(120,85,25,.12);
+    color:#aebdcc;
+    font-size:13px;
+    line-height:1.5;
+}
+.warning b{color:#ffd984}
+.nameRow{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+.nameRow input{
+    flex:1;
+    min-width:0;
+    padding:14px;
+    background:#050a11;
+    color:white;
+    border:1px solid #344d65;
+    outline:none;
+    font-size:16px;
+}
+.button{
+    border:1px solid #52728f;
+    background:#102337;
+    color:#e4f8ff;
+    padding:12px 20px;
+    cursor:pointer;
+    font-weight:800;
+    letter-spacing:.08em;
+}
+.button:hover{
+    background:#183650;
+    box-shadow:0 0 20px rgba(90,210,255,.18);
+}
+.small{
+    color:#60768b;
+    font-size:11px;
+    margin-top:12px;
+}
+
+/* HUD */
+#hud{
+    display:none;
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+}
+#stats{
+    position:absolute;
+    top:17px;
+    left:18px;
+    width:285px;
+}
+.brand{
+    color:#a4efff;
+    font-size:15px;
+    font-weight:900;
+    letter-spacing:.25em;
+    margin-bottom:10px;
+    text-shadow:0 0 16px #308db0;
+}
+.meter{
+    height:13px;
+    margin:5px 0;
+    position:relative;
+    overflow:hidden;
+    background:#070c14;
+    border:1px solid #263b50;
+}
+.meter i{
+    display:block;
+    height:100%;
+    width:50%;
+    transition:width .1s;
+}
+.hp i{
+    background:#e24f69;
+    box-shadow:0 0 14px #e24f69;
+}
+.sh i{
+    background:#5b9fff;
+    box-shadow:0 0 14px #5b9fff;
+}
+.en i{
+    background:#4fd8b9;
+    box-shadow:0 0 14px #4fd8b9;
+}
+.meter span{
+    position:absolute;
+    left:7px;
+    top:-1px;
+    font-size:9px;
+    font-weight:900;
+    text-shadow:0 1px 3px black;
+}
+.statline{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-top:7px;
+    color:#9db1c2;
+    font-size:11px;
+}
+
+/* MINIMAP */
+#map{
+    position:absolute;
+    right:18px;
+    top:17px;
+    width:190px;
+    height:190px;
+    border:1px solid #36536c;
+    background:rgba(3,7,13,.82);
+    box-shadow:0 0 35px rgba(0,0,0,.7);
+}
+
+/* CHAT */
+#chat{
+    position:absolute;
+    right:18px;
+    top:220px;
+    width:310px;
+    max-height:165px;
+    overflow:hidden;
+    padding:7px 10px;
+    text-align:left;
+    font-size:12px;
+    background:linear-gradient(
+        90deg,
+        rgba(3,7,13,0),
+        rgba(3,7,13,.8)
+    );
+    text-shadow:0 1px 3px #000;
+}
+.chatMsg{
+    margin:3px 0;
+    color:#b8c9d9;
+}
+.chatMsg b{color:#75dcff}
+.chatSystem{color:#6f899e}
+
+/* SERVER */
+#server{
+    position:absolute;
+    right:18px;
+    bottom:16px;
+    color:#71889b;
+    font-size:11px;
+}
+.online{color:#6de8bd}
+
+/* CROSSHAIR */
+#crosshair{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:26px;
+    height:26px;
+    transform:translate(-50%,-50%);
+}
+.cross{
+    position:absolute;
+    background:#aeefff;
+    box-shadow:0 0 8px #5ddcff;
+}
+.cross.t,.cross.b{
+    width:2px;
+    height:9px;
+    left:12px;
+}
+.cross.t{top:0}
+.cross.b{bottom:0}
+.cross.l,.cross.r{
+    width:9px;
+    height:2px;
+    top:12px;
+}
+.cross.l{left:0}
+.cross.r{right:0}
+
+/* HOTBAR */
+#hotbar{
+    position:absolute;
+    bottom:21px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:5px;
+    pointer-events:auto;
+}
+.slot{
+    width:76px;
+    height:65px;
+    position:relative;
+    text-align:center;
+    padding-top:8px;
+    background:rgba(5,11,19,.93);
+    border:1px solid #344a5e;
+}
+.slot.active{
+    border-color:#9deaff;
+    background:rgba(15,30,47,.96);
+    box-shadow:
+        0 0 15px rgba(74,211,255,.25),
+        inset 0 0 15px rgba(70,200,255,.05);
+}
+.slot .key{
+    position:absolute;
+    left:5px;
+    top:3px;
+    color:#71889b;
+    font-size:10px;
+}
+.slot .icon{
+    font-size:25px;
+}
+.slot small{
+    display:block;
+    margin-top:3px;
+    color:#a4b8c8;
+    font-size:8px;
+}
+
+/* CONTROLS */
+#controls{
+    position:absolute;
+    left:18px;
+    bottom:18px;
+    color:#61788d;
+    font-size:10px;
+    line-height:1.7;
+}
+.hint{color:#9db7ca}
+
+/* TOAST */
+#toast{
+    position:absolute;
+    top:15%;
+    left:50%;
+    transform:translateX(-50%);
+    opacity:0;
+    color:#c5f6ff;
+    font-weight:900;
+    letter-spacing:.16em;
+    text-shadow:0 0 20px #58ddff;
+    transition:.2s;
+}
+
+/* PANELS */
+.overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:70;
+    align-items:center;
+    justify-content:center;
+    background:rgba(1,3,8,.73);
+    backdrop-filter:blur(8px);
+    pointer-events:auto;
+}
+.menuPanel{
+    width:min(750px,92vw);
+    max-height:85vh;
+    overflow:auto;
+    padding:32px;
+    background:
+        linear-gradient(145deg,rgba(12,21,35,.98),rgba(3,7,14,.98));
+    border:1px solid #354e66;
+    box-shadow:0 30px 120px #000;
+}
+.menuPanel h2{
+    margin:0 0 20px;
+    letter-spacing:.13em;
+}
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+    gap:10px;
+}
+.card{
+    padding:15px;
+    background:#08121e;
+    border:1px solid #263c50;
+}
+.card h3{
+    margin:0 0 7px;
+    color:#8ee9ff;
+    font-size:13px;
+}
+.card p{
+    margin:0;
+    color:#7f95a8;
+    font-size:11px;
+    line-height:1.5;
+}
+.row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    padding:12px 0;
+    border-bottom:1px solid #172638;
+    color:#a0b4c4;
+    font-size:13px;
+}
+.close{
+    margin-top:18px;
+}
+
+/* DAMAGE */
+#damage{
+    position:fixed;
+    inset:0;
+    z-index:10;
+    pointer-events:none;
+    opacity:0;
+    background:
+        radial-gradient(circle,
+        transparent 45%,
+        rgba(255,25,65,.25));
+}
+</style>
+</head>
+
+<body>
+
+<div id="boot">
+    <div class="bootBox">
+        <h1 class="logo">VOIDFALL</h1>
+        <div class="sub">2.0 // CINEMATIC EDITION</div>
+        <div class="bootBar"><i></i></div>
+        <div class="bootText">INITIALIZING VOID ENGINE</div>
+    </div>
+</div>
+
+<div id="login">
+    <div class="loginPanel">
+        <h1>VOIDFALL 2.0</h1>
+        <div class="subtitle">ENTER THE FRONTIER</div>
+
+        <div class="warning">
+            <b>WARNING 01:</b>
+            Your username becomes your permanent server identity.
+        </div>
+
+        <div class="warning">
+            <b>WARNING 02:</b>
+            Your username cannot be changed later. Choose carefully.
+        </div>
+
+        <div class="nameRow">
+            <input
+                id="nameInput"
+                maxlength="16"
+                placeholder="3–16 letters, numbers or _"
+            >
+        </div>
+
+        <div class="nameRow">
+            <input
+                id="passwordInput"
+                type="password"
+                maxlength="64"
+                placeholder="Password"
+            >
+            <button class="button" id="joinButton">
+                ENTER
+            </button>
+        </div>
+
+        <div class="small">
+            First time: your password creates a local account on this browser.
+            Returning players must enter the same password. Do not use a real
+            personal password.
+        </div>
+    </div>
+</div>
+
+<canvas id="game"></canvas>
+
+<div id="damage"></div>
+
+<div id="hud">
+
+    <div id="stats">
+        <div class="brand">VOIDFALL // 2.0</div>
+
+        <div class="meter hp">
+            <i></i>
+            <span>HEALTH</span>
+        </div>
+
+        <div class="meter sh">
+            <i></i>
+            <span>SHIELD</span>
+        </div>
+
+        <div class="meter en">
+            <i></i>
+            <span>ENERGY</span>
+        </div>
+
+        <div class="statline">
+            <span id="money">¢100</span>
+            <span id="level">LV 1</span>
+            <span id="xp">XP 0</span>
+        </div>
+
+        <div class="statline">
+            <span id="kills">KILLS 0</span>
+            <span id="score">SCORE 0</span>
+            <span id="wave">WAVE 1</span>
+        </div>
+    </div>
+
+    <canvas id="map" width="190" height="190"></canvas>
+
+    <div id="chat"></div>
+
+    <div id="server">
+        CONNECTING...
+    </div>
+
+    <div id="crosshair">
+        <i class="cross t"></i>
+        <i class="cross b"></i>
+        <i class="cross l"></i>
+        <i class="cross r"></i>
+    </div>
+
+    <div id="toast"></div>
+
+    <div id="hotbar">
+
+        <div class="slot ansyes-only">
+            <span class="key">1</span>
+            <div class="icon">✦</div>
+            <small>END CRYSTAL</small>
+        </div>
+
+        <div class="slot ansyes-only">
+            <span class="key">2</span>
+            <div class="icon">⬛</div>
+            <small>OBSIDIAN</small>
+        </div>
+
+        <div class="slot active">
+            <span class="key">3</span>
+            <div class="icon">⌁</div>
+            <small>PLASMA</small>
+        </div>
+
+        <div class="slot">
+            <span class="key">4</span>
+            <div class="icon">◈</div>
+            <small>SHOTGUN</small>
+        </div>
+
+        <div class="slot">
+            <span class="key">5</span>
+            <div class="icon">ϟ</div>
+            <small>ARC CANNON</small>
+        </div>
+
+        <div class="slot">
+            <span class="key">6</span>
+            <div class="icon">⚔</div>
+            <small>SWORD</small>
+        </div>
+
+        <div class="slot">
+            <span class="key">7</span>
+            <div class="icon">刀</div>
+            <small>KATANA</small>
+        </div>
+
+    </div>
+
+    <div id="controls">
+        <span class="hint">WASD</span> MOVE
+        ·
+        <span class="hint">SHIFT</span> SPRINT
+        ·
+        <span class="hint">SPACE</span> DASH
+        <br>
+        <span class="hint">LMB</span> ATTACK
+        ·
+        <span class="hint">1</span> CRYSTAL
+        ·
+        <span class="hint">2</span> OBSIDIAN
+        ·
+        <span class="hint">3-7</span> WEAPONS
+        <br>
+        <span class="hint">E</span> INTERACT
+        ·
+        <span class="hint">T</span> CHAT
+        ·
+        <span class="hint">I</span> INVENTORY
+        ·
+        <span class="hint">P</span> PAUSE
+        ·
+        <span class="hint">G</span> SAVE
+        ·
+        <span class="hint">Q</span> SHOP
+    </div>
+
+</div>
+
+<div class="overlay" id="systemMenu">
+    <div class="menuPanel">
+        <h2>VOIDFALL // SYSTEM</h2>
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>OBJECTIVE</h3>
+                <p>
+                    Survive the Voidfall, destroy hostile entities,
+                    rescue survivors and advance through increasingly
+                    dangerous waves.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>SANCTUARY</h3>
+                <p>
+                    The central sanctuary prevents enemies from entering.
+                    Damage is disabled and your health, shield and energy
+                    regenerate.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>WEAPONS</h3>
+                <p>
+                    1 Plasma Rifle · 2 Void Shotgun · 3 Arc Cannon ·
+                    4 Sword · 5 Katana.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>CRYSTAL PROTOCOL</h3>
+                <p>
+                    6 places Obsidian. 7 places an End Crystal on
+                    Obsidian. Click the crystal again to detonate it.
+                    Crystal explosions cannot damage the player.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>MULTIPLAYER</h3>
+                <p>
+                    Connected players appear in the world and can
+                    communicate through the multiplayer chat.
+                </p>
+            </div>
+
+        </div>
+
+        <button class="button close" onclick="closeAllPanels()">
+            CLOSE
+        </button>
+    </div>
+</div>
+
+<div class="overlay" id="inventory">
+    <div class="menuPanel">
+        <h2>INVENTORY</h2>
+        <div id="inventoryContent"></div>
+
+        <button class="button close" onclick="closeAllPanels()">
+            CLOSE
+        </button>
+    </div>
+</div>
+
+<div class="overlay" id="shop">
+    <div class="menuPanel">
+        <h2>VOID MARKET</h2>
+        <div id="shopContent"></div>
+
+        <button class="button close" onclick="closeAllPanels()">
+            CLOSE
+        </button>
+    </div>
+</div>
+
+<div class="overlay" id="quest">
+    <div class="menuPanel">
+        <h2>QUEST LOG</h2>
+
+        <div class="card">
+            <h3>THE FIRST WAVE</h3>
+            <p>Defeat 15 hostile entities.</p>
+            <p id="questProgress">
+                Progress: 0/15
+            </p>
+        </div>
+
+        <button class="button close" onclick="closeAllPanels()">
+            CLOSE
+        </button>
+    </div>
+</div>
+
+<div class="overlay" id="pause">
+    <div class="menuPanel">
+        <h2>PAUSED</h2>
+        <p>THE VOID IS WAITING</p>
+
+        <button class="button close" onclick="togglePause()">
+            RESUME
+        </button>
+    </div>
+</div>
+
+<script>
+"use strict";
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const mapCanvas = document.getElementById("map");
+const mapCtx = mapCanvas.getContext("2d");
+
+let WIDTH = innerWidth;
+let HEIGHT = innerHeight;
+let DPR = Math.min(devicePixelRatio || 1,2);
+
+function resize(){
+    WIDTH=innerWidth;
+    HEIGHT=innerHeight;
+
+    canvas.width=WIDTH*DPR;
+    canvas.height=HEIGHT*DPR;
+
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+
+addEventListener("resize",resize);
+resize();
+
+const TAU=Math.PI*2;
+
+function rand(min,max){
+    return min+Math.random()*(max-min);
+}
+
+function clamp(value,min,max){
+    return Math.max(min,Math.min(max,value));
+}
+
+function distance(x1,y1,x2,y2){
+    return Math.hypot(x1-x2,y1-y2);
+}
+
+function angleDifference(a,b){
+    return Math.abs(
+        Math.atan2(
+            Math.sin(a-b),
+            Math.cos(a-b)
+        )
+    );
+}
+
+function esc(text){
+    return String(text).replace(
+        /[&<>"]/g,
+        c=>({
+            "&":"&amp;",
+            "<":"&lt;",
+            ">":"&gt;",
+            '"':"&quot;"
+        }[c])
+    );
+}
+
+/* =========================================================
+   GAME STATE
+   ========================================================= */
+
+let gameState="boot";
+let paused=false;
+let username="";
+
+let socket=null;
+let connected=false;
+
+let lastTime=performance.now();
+
+let shake=0;
+let damageFlash=0;
+let worldTime=0;
+
+const world={
+    width:9000,
+    height:9000,
+    seed:Math.random()*999999
+};
+
+const player={
+    x:4500,
+    y:4500,
+
+    radius:18,
+
+    health:100,
+    maxHealth:100,
+
+    shield:50,
+    maxShield:50,
+
+    energy:100,
+    maxEnergy:100,
+
+    level:1,
+    xp:0,
+
+    money:100,
+
+    kills:0,
+    score:0,
+    wave:1,
+
+    weapon:0,
+
+    /* 0-4 = weapons
+       5 = obsidian
+       6 = end crystal */
+    /* Hotbar: 1 Crystal, 2 Obsidian, 3 Plasma, 4 Shotgun, 5 Arc Cannon, 6 Sword, 7 Katana */
+    selectedSlot:2,
+
+    angle:0,
+
+    speed:240,
+
+    dashCooldown:0,
+    fireCooldown:0
+};
+
+const inventory={
+    wood:0,
+    metal:0,
+    crystal:0,
+    medkit:2,
+    ammo:0,
+
+    /* Infinite building materials.
+       These are intentionally not consumed. */
+    obsidian:Infinity,
+    endCrystal:Infinity
+};
+
+const upgrades={
+    damage:0,
+    fireRate:0,
+    maxHealth:0,
+    shield:0,
+    speed:0,
+    crit:0,
+    regen:0,
+    shieldRegen:0
+};
+
+const keys={};
+
+const mouse={
+    x:WIDTH/2,
+    y:HEIGHT/2,
+    down:false
+};
+
+const enemies=[];
+const bullets=[];
+const particles=[];
+const drops=[];
+const structures=[];
+const otherPlayers=new Map();
+
+/* =========================================================
+   VOID WORLD // TREES, OBSTACLES, CHESTS, RESCUES, WEATHER
+   ========================================================= */
+
+const trees=[];
+const obstacles=[];
+const chests=[];
+const rescueSites=[];
+
+let weather={
+    type:"clear",
+    timer:42,
+    lightning:0,
+    flash:0
+};
+
+function seededRandom(seed){
+    let x=Math.floor(seed)>>>0;
+    return function(){
+        x+=0x6D2B79F5;
+        let t=x;
+        t=Math.imul(t^(t>>>15),t|1);
+        t^=t+Math.imul(t^(t>>>7),t|61);
+        return ((t^(t>>>14))>>>0)/4294967296;
+    };
+}
+
+function generateWorldFeatures(){
+    trees.length=0;
+    obstacles.length=0;
+    chests.length=0;
+    rescueSites.length=0;
+
+    const r=seededRandom(world.seed*1000);
+
+    for(let i=0;i<170;i++){
+        let x=rand(100,world.width-100);
+        let y=rand(100,world.height-100);
+
+        if(distance(x,y,4500,4500)<650){
+            i--;
+            continue;
+        }
+
+        trees.push({
+            x,y,
+            size:18+r()*17,
+            phase:r()*TAU
+        });
+    }
+
+    for(let i=0;i<90;i++){
+        let x=rand(100,world.width-100);
+        let y=rand(100,world.height-100);
+
+        if(distance(x,y,4500,4500)<620){
+            i--;
+            continue;
+        }
+
+        obstacles.push({
+            x,y,
+            radius:18+r()*24,
+            kind:r()<.55?"rock":"ruin",
+            phase:r()*TAU
+        });
+    }
+
+    for(let i=0;i<24;i++){
+        let x=rand(250,world.width-250);
+        let y=rand(250,world.height-250);
+
+        if(distance(x,y,4500,4500)<750){
+            i--;
+            continue;
+        }
+
+        chests.push({
+            x,y,
+            opened:false,
+            money:Math.floor(35+r()*140),
+            phase:r()*TAU
+        });
+    }
+
+    for(let i=0;i<12;i++){
+        let x=rand(400,world.width-400);
+        let y=rand(400,world.height-400);
+
+        if(distance(x,y,4500,4500)<800){
+            i--;
+            continue;
+        }
+
+        rescueSites.push({
+            x,y,
+            rescued:false,
+            pulse:r()*TAU
+        });
+    }
+}
+
+generateWorldFeatures();
+
+function nearestChest(){
+    let best=null;
+    let bestD=95;
+
+    for(const chest of chests){
+        if(chest.opened) continue;
+        const d=distance(player.x,player.y,chest.x,chest.y);
+        if(d<bestD){
+            bestD=d;
+            best=chest;
+        }
+    }
+
+    return best;
+}
+
+function nearestRescue(){
+    let best=null;
+    let bestD=105;
+
+    for(const site of rescueSites){
+        if(site.rescued) continue;
+        const d=distance(player.x,player.y,site.x,site.y);
+        if(d<bestD){
+            bestD=d;
+            best=site;
+        }
+    }
+
+    return best;
+}
+
+function interactWorld(){
+    if(gameState!=="game" || paused || chatOpen) return;
+
+    const chest=nearestChest();
+
+    if(chest){
+        chest.opened=true;
+        player.money+=chest.money;
+        player.score+=chest.money;
+        gainXP(25);
+        for(let i=0;i<18;i++){
+            const a=rand(0,TAU);
+            particle(chest.x,chest.y,{
+                vx:Math.cos(a)*rand(30,110),
+                vy:Math.sin(a)*rand(30,110),
+                life:rand(.3,.8),
+                size:rand(2,7)
+            });
+        }
+        showToast("VOID CHEST // +¢"+chest.money);
+        saveGame(false);
+        return;
+    }
+
+    const rescue=nearestRescue();
+
+    if(rescue){
+        rescue.rescued=true;
+        player.money+=90;
+        player.score+=250;
+        gainXP(80);
+        showToast("SURVIVOR RESCUED // +¢90");
+        for(let i=0;i<25;i++){
+            const a=rand(0,TAU);
+            particle(rescue.x,rescue.y,{
+                vx:Math.cos(a)*rand(40,150),
+                vy:Math.sin(a)*rand(40,150),
+                life:rand(.35,.9),
+                size:rand(2,7)
+            });
+        }
+        saveGame(false);
+    }
+}
+
+function resolveWorldCollision(){
+    for(const rock of obstacles){
+        const d=distance(player.x,player.y,rock.x,rock.y);
+        const minD=player.radius+rock.radius;
+
+        if(d<minD){
+            const a=Math.atan2(player.y-rock.y,player.x-rock.x);
+            player.x=rock.x+Math.cos(a)*minD;
+            player.y=rock.y+Math.sin(a)*minD;
+        }
+    }
+}
+
+function updateWeather(dt){
+    weather.timer-=dt;
+    weather.flash=Math.max(0,weather.flash-dt*4);
+
+    if(weather.timer<=0){
+        const types=["clear","rain","storm","fog"];
+        weather.type=types[Math.floor(Math.random()*types.length)];
+        weather.timer=35+Math.random()*55;
+
+        if(weather.type==="storm"){
+            showToast("VOID STORM APPROACHING");
+        }else if(weather.type==="rain"){
+            showToast("WEATHER // VOID RAIN");
+        }else if(weather.type==="fog"){
+            showToast("WEATHER // VOID FOG");
+        }
+    }
+
+    if(weather.type==="storm" && Math.random()<dt*.035){
+        weather.lightning=.22;
+        weather.flash=.35;
+    }else{
+        weather.lightning=Math.max(0,weather.lightning-dt);
+    }
+}
+
+/* =========================================================
+   CRYSTAL PVP WORLD OBJECTS
+   ========================================================= */
+
+const obsidianBlocks=[];
+const endCrystals=[];
+
+const OBSIDIAN_GRID=45;
+const ITEM_RANGE=720;
+const CRYSTAL_RADIUS=17;
+const CRYSTAL_EXPLOSION_RADIUS=220;
+const CRYSTAL_DAMAGE=2100;
+
+function snapWorld(value){
+    return Math.round(value/OBSIDIAN_GRID)*OBSIDIAN_GRID;
+}
+
+function getMouseWorld(){
+
+    return {
+        x:
+            player.x+
+            mouse.x-
+            WIDTH/2,
+
+        y:
+            player.y+
+            mouse.y-
+            HEIGHT/2
+    };
+
+}
+
+function findObsidianAt(x,y){
+
+    for(const block of obsidianBlocks){
+
+        if(
+            distance(
+                x,
+                y,
+                block.x,
+                block.y
+            )<
+            OBSIDIAN_GRID*.58
+        ){
+
+            return block;
+
+        }
+
+    }
+
+    return null;
+
+}
+
+function findCrystalAt(x,y){
+
+    for(const crystal of endCrystals){
+
+        if(
+            distance(
+                x,
+                y,
+                crystal.x,
+                crystal.y
+            )<
+            CRYSTAL_RADIUS+15
+        ){
+
+            return crystal;
+
+        }
+
+    }
+
+    return null;
+
+}
+
+function isAnsyes(){
+
+    return username==="Ansyes";
+
+}
+
+function placeObsidian(){
+
+    if(!isAnsyes()){
+        showToast("ANYSYES ONLY");
+        return;
+    }
+
+    const target=getMouseWorld();
+
+    if(distance(player.x,player.y,target.x,target.y)>ITEM_RANGE){
+        showToast("TOO FAR");
+        return;
+    }
+
+    const clickedBlock=findObsidianAt(target.x,target.y);
+
+    /* Clicking existing obsidian breaks it unless a crystal is armed on it. */
+    if(clickedBlock){
+
+        if(endCrystals.some(crystal=>crystal.obsidian===clickedBlock)){
+            showToast("CRYSTAL ARMED // DETONATE FIRST");
+            return;
+        }
+
+        const index=obsidianBlocks.indexOf(clickedBlock);
+        if(index!==-1){
+            obsidianBlocks.splice(index,1);
+        }
+
+        for(let i=0;i<16;i++){
+            const a=rand(0,TAU);
+            particle(clickedBlock.x,clickedBlock.y,{
+                vx:Math.cos(a)*rand(35,120),
+                vy:Math.sin(a)*rand(35,120),
+                life:rand(.25,.65),
+                size:rand(2,6),
+                type:1
+            });
+        }
+
+        showToast("OBSIDIAN BROKEN");
+        return;
+    }
+
+    const x=snapWorld(target.x);
+    const y=snapWorld(target.y);
+
+    if(x<60 || y<60 || x>world.width-60 || y>world.height-60){
+        return;
+    }
+
+    if(findObsidianAt(x,y)){
+        showToast("OBSIDIAN ALREADY PLACED");
+        return;
+    }
+
+    obsidianBlocks.push({x,y,born:worldTime});
+
+    for(let i=0;i<12;i++){
+        particle(x,y,{
+            vx:rand(-45,45),
+            vy:rand(-45,45),
+            life:rand(.25,.6),
+            size:rand(2,6),
+            type:1
+        });
+    }
+
+    showToast("OBSIDIAN PLACED");
+
+}
+
+function placeCrystal(){
+
+    if(!isAnsyes()){
+        showToast("ANYSYES ONLY");
+        return;
+    }
+
+    const target=getMouseWorld();
+
+    if(
+        distance(
+            player.x,
+            player.y,
+            target.x,
+            target.y
+        )>ITEM_RANGE
+    ){
+
+        showToast("TOO FAR");
+
+        return;
+
+    }
+
+    /* First check whether the player clicked
+       an already-existing crystal. */
+    const clickedCrystal=
+        findCrystalAt(
+            target.x,
+            target.y
+        );
+
+    if(clickedCrystal){
+
+        detonateCrystal(clickedCrystal);
+
+        return;
+
+    }
+
+    const block=
+        findObsidianAt(
+            target.x,
+            target.y
+        );
+
+    if(!block){
+
+        showToast(
+            "END CRYSTAL NEEDS OBSIDIAN"
+        );
+
+        return;
+
+    }
+
+    if(
+        endCrystals.some(
+            crystal=>
+                crystal.obsidian===block
+        )
+    ){
+
+        showToast(
+            "CRYSTAL ALREADY PLACED"
+        );
+
+        return;
+
+    }
+
+    const crystal={
+        x:block.x,
+        y:block.y,
+        obsidian:block,
+        born:worldTime,
+        pulse:rand(0,TAU)
+    };
+
+    endCrystals.push(crystal);
+
+    for(let i=0;i<18;i++){
+
+        const a=rand(0,TAU);
+
+        particle(
+            crystal.x,
+            crystal.y,
+            {
+                vx:Math.cos(a)*rand(30,100),
+                vy:Math.sin(a)*rand(30,100),
+                life:rand(.25,.65),
+                size:rand(2,6),
+                type:1
+            }
+        );
+
+    }
+
+    showToast("END CRYSTAL ARMED");
+
+}
+
+function detonateCrystal(crystal){
+
+    if(!crystal){
+        return;
+    }
+
+    const x=crystal.x;
+    const y=crystal.y;
+
+    const index=
+        endCrystals.indexOf(
+            crystal
+        );
+
+    if(index!==-1){
+        endCrystals.splice(index,1);
+    }
+
+    /* BIG cinematic explosion */
+
+    explosion(
+        x,
+        y,
+        85
+    );
+
+    for(let i=0;i<55;i++){
+
+        const a=rand(0,TAU);
+        const speed=rand(80,500);
+
+        particle(
+            x,
+            y,
+            {
+                vx:Math.cos(a)*speed,
+                vy:Math.sin(a)*speed,
+                life:rand(.35,1.2),
+                size:rand(3,10),
+                type:1
+            }
+        );
+
+    }
+
+    /* Damage every enemy inside the explosion.
+       Void Titan receives exactly 2100 damage,
+       which is half of its original 4200 HP. */
+
+    /* WORLD FEATURES ON MINIMAP */
+    mapCtx.fillStyle="#3b7048";
+    for(const tree of trees){
+        mapCtx.fillRect(tree.x*scale-1,tree.y*scale-1,2,2);
+    }
+
+    mapCtx.fillStyle="#697b87";
+    for(const rock of obstacles){
+        mapCtx.fillRect(rock.x*scale-1,rock.y*scale-1,2,2);
+    }
+
+    mapCtx.fillStyle="#ffd45c";
+    for(const chest of chests){
+        if(!chest.opened){
+            mapCtx.fillRect(chest.x*scale-2,chest.y*scale-2,4,4);
+        }
+    }
+
+    mapCtx.fillStyle="#75eaff";
+    for(const site of rescueSites){
+        if(!site.rescued){
+            mapCtx.fillRect(site.x*scale-2,site.y*scale-2,4,4);
+        }
+    }
+
+    for(const enemy of enemies){
+
+        if(enemy.dead){
+            continue;
+        }
+
+        const d=
+            distance(
+                x,
+                y,
+                enemy.x,
+                enemy.y
+            );
+
+        if(d<=CRYSTAL_EXPLOSION_RADIUS){
+
+            const falloff=
+                1-
+                clamp(
+                    d/CRYSTAL_EXPLOSION_RADIUS,
+                    0,
+                    .75
+                );
+
+            const damage=
+                enemy.type===4
+                ?CRYSTAL_DAMAGE
+                :Math.round(
+                    CRYSTAL_DAMAGE*
+                    Math.max(.35,falloff)
+                );
+
+            damageEnemy(
+                enemy,
+                damage
+            );
+
+        }
+
+    }
+
+    /*
+     * IMPORTANT:
+     * There is deliberately NO damagePlayer()
+     * call here.
+     *
+     * Crystal explosions deal 0 damage to
+     * the player.
+     */
+
+    shake=35;
+
+    damageFlash=.05;
+
+    showToast(
+        "END CRYSTAL DETONATED // 2100 DMG"
+    );
+
+}
+
+/* =========================================================
+   STARS
+   ========================================================= */
+
+const stars=[];
+
+for(let i=0;i<220;i++){
+
+    stars.push({
+        x:Math.random(),
+        y:Math.random(),
+        size:rand(.3,2),
+        alpha:rand(.2,1)
+    });
+
+}
+
+/* =========================================================
+   WEAPONS
+   ========================================================= */
+
+const weapons=[
+
+    {
+        name:"PLASMA RIFLE",
+        cooldown:.13,
+        damage:32,
+        speed:980,
+        pellets:1,
+        spread:.025,
+        range:900,
+        type:"gun"
+    },
+
+    {
+        name:"VOID SHOTGUN",
+        cooldown:.6,
+        damage:20,
+        speed:800,
+        pellets:8,
+        spread:.23,
+        range:650,
+        type:"gun"
+    },
+
+    {
+        name:"ARC CANNON",
+        cooldown:.9,
+        damage:100,
+        speed:1250,
+        pellets:1,
+        spread:.01,
+        range:1200,
+        type:"gun"
+    },
+
+    {
+        name:"SWORD",
+        cooldown:.65,
+        damage:115,
+        range:125,
+        type:"melee"
+    },
+
+    {
+        name:"KATANA",
+        cooldown:.30,
+        damage:85,
+        range:155,
+        type:"melee"
+    }
+
+];
+
+/* =========================================================
+   ENEMIES
+   ========================================================= */
+
+const enemyTypes=[
+
+    {
+        name:"CRAWLER",
+        radius:16,
+        health:55,
+        speed:80,
+        damage:8,
+        xp:12
+    },
+
+    {
+        name:"STALKER",
+        radius:20,
+        health:95,
+        speed:110,
+        damage:12,
+        xp:20
+    },
+
+    {
+        name:"BRUTE",
+        radius:30,
+        health:280,
+        speed:55,
+        damage:22,
+        xp:45
+    },
+
+    {
+        name:"ELITE",
+        radius:25,
+        health:480,
+        speed:95,
+        damage:30,
+        xp:80
+    },
+
+    {
+        name:"VOID TITAN",
+        radius:76,
+        health:4200,
+        speed:32,
+        damage:45,
+        xp:600
+    }
+
+];
+
+/* =========================================================
+   PARTICLES
+   ========================================================= */
+
+function particle(x,y,options={}){
+
+    particles.push({
+
+        x,
+        y,
+
+        vx:options.vx ?? rand(-80,80),
+        vy:options.vy ?? rand(-80,80),
+
+        life:options.life ?? rand(.25,.7),
+
+        maxLife:options.life ?? .5,
+
+        size:options.size ?? rand(2,6),
+
+        type:options.type ?? 0
+
+    });
+
+}
+
+function explosion(x,y,count=20){
+
+    for(let i=0;i<count;i++){
+
+        const a=rand(0,TAU);
+        const speed=rand(50,300);
+
+        particle(x,y,{
+            vx:Math.cos(a)*speed,
+            vy:Math.sin(a)*speed,
+            life:rand(.25,.9),
+            size:rand(2,7)
+        });
+
+    }
+
+}
+
+/* =========================================================
+   SAFE ZONE
+   ========================================================= */
+
+function inSafeZone(){
+
+    return distance(
+        player.x,
+        player.y,
+        4500,
+        4500
+    )<420;
+
+}
+
+/* =========================================================
+   SPAWN ENEMIES
+   ========================================================= */
+
+function spawnEnemy(type=0,forced=false){
+
+    if(!forced && inSafeZone()){
+        return;
+    }
+
+    const angle=rand(0,TAU);
+    const radius=rand(950,1450);
+
+    let x=player.x+Math.cos(angle)*radius;
+    let y=player.y+Math.sin(angle)*radius;
+
+    x=clamp(x,80,world.width-80);
+    y=clamp(y,80,world.height-80);
+
+    if(distance(x,y,4500,4500)<520){
+
+        x+=Math.cos(angle)*700;
+        y+=Math.sin(angle)*700;
+
+    }
+
+    const info=enemyTypes[type];
+
+    const hp=
+        info.health*
+        (1+player.wave*.09);
+
+    enemies.push({
+
+        x,
+        y,
+
+        radius:info.radius,
+
+        health:hp,
+        maxHealth:hp,
+
+        speed:
+            info.speed*
+            (1+player.wave*.015),
+
+        damage:info.damage,
+
+        type,
+
+        attackCooldown:0,
+
+        hit:0,
+
+        phase:rand(0,TAU),
+
+        dead:false
+
+    });
+
+}
+
+function spawnWave(){
+
+    const count=
+        Math.min(
+            5+player.wave*2,
+            55
+        );
+
+    for(let i=0;i<count;i++){
+
+        let r=Math.random();
+
+        let type=0;
+
+        if(r>.96 && player.wave>7){
+            type=3;
+        }
+        else if(r>.86 && player.wave>3){
+            type=2;
+        }
+        else if(r>.68){
+            type=1;
+        }
+
+        spawnEnemy(type,true);
+
+    }
+
+    if(player.wave%5===0){
+
+        spawnEnemy(4,true);
+
+        showToast("VOID TITAN DETECTED");
+
+    }
+
+}
+
+spawnWave();
+
+/* =========================================================
+   NETWORK
+   ========================================================= */
+
+function connectServer(){
+
+    try{
+
+        const protocol=
+            location.protocol==="https:"
+            ?"wss://"
+            :"ws://";
+
+        socket=
+            new WebSocket(
+                protocol+
+                location.host
+            );
+
+        socket.onopen=()=>{
+
+            connected=true;
+
+            serverMessage(
+                "ONLINE // MULTIPLAYER LINK ESTABLISHED"
+            );
+
+            sendNetwork({
+                type:"chooseUsername",
+                username
+            });
+
+        };
+
+        socket.onclose=()=>{
+
+            connected=false;
+
+            serverMessage(
+                "SERVER LINK LOST // LOCAL MODE"
+            );
+
+        };
+
+        socket.onerror=()=>{
+            connected=false;
+        };
+
+        socket.onmessage=e=>{
+
+            let message;
+
+            try{
+                message=JSON.parse(e.data);
+            }
+            catch{
+                return;
+            }
+
+            handleNetwork(message);
+
+        };
+
+    }
+    catch{
+
+        connected=false;
+
+    }
+
+}
+
+function sendNetwork(data){
+
+    if(
+        socket &&
+        socket.readyState===WebSocket.OPEN
+    ){
+
+        socket.send(
+            JSON.stringify(data)
+        );
+
+    }
+
+}
+
+function handleNetwork(message){
+
+    if(message.type==="usernameResult"){
+
+        if(!message.ok){
+
+            showToast(
+                message.reason ||
+                "USERNAME REJECTED"
+            );
+
+            return;
+
+        }
+
+        if(message.data){
+
+            applyServerData(
+                message.data
+            );
+
+        }
+
+        if(!isAnsyes()){
+            player.selectedSlot=2;
+            player.weapon=0;
+        }
+
+        showToast("IDENTITY CONFIRMED");
+
+        document.getElementById("login").style.display="none";
+        document.getElementById("hud").style.display="block";
+
+        gameState="game";
+
+        saveGame(false);
+
+    }
+
+    if(message.type==="playerJoined"){
+
+        if(
+            message.player &&
+            message.player.username!==username
+        ){
+
+            const o=message.player;
+
+            otherPlayers.set(
+                o.username,
+                {
+                    ...o,
+                    renderX:o.x||4500,
+                    renderY:o.y||4500
+                }
+            );
+
+        }
+
+        serverMessage(
+            (message.player?.username||"PLAYER")+
+            " ENTERED THE VOID"
+        );
+
+    }
+
+    if(message.type==="playerLeft"){
+
+        otherPlayers.delete(
+            message.username
+        );
+
+    }
+
+    if(message.type==="playerMoved"){
+
+        if(message.username!==username){
+
+            let o=otherPlayers.get(
+                message.username
+            );
+
+            if(!o){
+
+                o={
+                    ...message,
+                    renderX:message.x,
+                    renderY:message.y
+                };
+
+            }
+            else{
+
+                Object.assign(
+                    o,
+                    message
+                );
+
+            }
+
+            otherPlayers.set(
+                message.username,
+                o
+            );
+
+        }
+
+    }
+
+    if(message.type==="chat"){
+
+        addChat(
+            message.username,
+            message.message
+        );
+
+    }
+
+    if(message.type==="serverInfo"){
+
+        document.getElementById("server").innerHTML=
+            '<span class="online">ONLINE</span> · '+
+            message.players+
+            '/'+
+            message.maxPlayers;
+
+    }
+
+}
+
+function applyServerData(data){
+
+    player.money=data.money ?? player.money;
+    player.level=data.level ?? player.level;
+    player.xp=data.xp ?? player.xp;
+    player.kills=data.kills ?? player.kills;
+    player.score=data.score ?? player.score;
+
+    player.health=
+        data.health ??
+        player.health;
+
+    player.maxHealth=
+        data.maxHealth ??
+        player.maxHealth;
+
+    player.shield=
+        data.shield ??
+        player.shield;
+
+    player.maxShield=
+        data.maxShield ??
+        player.maxShield;
+
+    player.energy=
+        data.energy ??
+        player.energy;
+
+    player.maxEnergy=
+        data.maxEnergy ??
+        player.maxEnergy;
+
+    player.wave=data.wave ?? player.wave;
+
+    if(data.inventory){
+
+        Object.assign(
+            inventory,
+            data.inventory
+        );
+
+        /*
+         * Keep crystal PvP materials infinite even if
+         * the server has an older inventory structure.
+         */
+        inventory.obsidian=Infinity;
+        inventory.endCrystal=Infinity;
+
+    }
+
+    if(data.upgrades){
+
+        Object.assign(
+            upgrades,
+            data.upgrades
+        );
+
+    }
+
+}
+
+function saveData(){
+
+    return {
+
+        money:player.money,
+
+        level:player.level,
+
+        xp:player.xp,
+
+        kills:player.kills,
+
+        score:player.score,
+
+        health:player.health,
+
+        maxHealth:player.maxHealth,
+
+        shield:player.shield,
+
+        maxShield:player.maxShield,
+
+        energy:player.energy,
+
+        maxEnergy:player.maxEnergy,
+
+        wave:player.wave,
+
+        /*
+         * Infinity is not sent to the server.
+         * These two materials are infinite by design.
+         */
+        inventory:{
+            wood:inventory.wood,
+            metal:inventory.metal,
+            crystal:inventory.crystal,
+            medkit:inventory.medkit,
+            ammo:inventory.ammo
+        },
+
+        upgrades
+
+    };
+
+}
+
+/* =========================================================
+   SAVE SYSTEM
+   ========================================================= */
+
+function saveGame(showMessage=true){
+
+    sendNetwork({
+        type:"save",
+        data:saveData()
+    });
+
+    if(
+        showMessage &&
+        gameState==="game"
+    ){
+
+        showToast("GAME SAVED");
+
+    }
+
+}
+
+/* =========================================================
+   CHAT
+   ========================================================= */
+
+function serverMessage(text){
+
+    const chat=
+        document.getElementById("chat");
+
+    const div=
+        document.createElement("div");
+
+    div.className=
+        "chatMsg chatSystem";
+
+    div.textContent=text;
+
+    chat.prepend(div);
+
+    while(chat.children.length>8){
+        chat.lastChild.remove();
+    }
+
+}
+
+function addChat(user,text){
+
+    const chat=
+        document.getElementById("chat");
+
+    const div=
+        document.createElement("div");
+
+    div.className="chatMsg";
+
+    div.innerHTML=
+        "<b>"+
+        esc(user)+
+        "</b>: "+
+        esc(text);
+
+    chat.prepend(div);
+
+    while(chat.children.length>8){
+        chat.lastChild.remove();
+    }
+
+}
+
+let chatOpen=false;
+
+function openChat(){
+
+    if(chatOpen){
+        return;
+    }
+
+    chatOpen=true;
+
+    const input=
+        document.createElement("input");
+
+    input.id="chatInput";
+
+    input.maxLength=180;
+
+    input.placeholder=
+        "TYPE MESSAGE...";
+
+    Object.assign(
+        input.style,
+        {
+            position:"fixed",
+            right:"18px",
+            bottom:"205px",
+            width:"310px",
+            padding:"10px",
+            background:"#07101a",
+            border:"1px solid #52718e",
+            color:"#fff",
+            zIndex:120,
+            outline:"none"
+        }
+    );
+
+    document.body.appendChild(input);
+
+    input.focus();
+
+    input.addEventListener(
+        "keydown",
+        e=>{
+
+            if(e.key==="Enter"){
+
+                const text=
+                    input.value.trim();
+
+                if(text){
+
+                    sendNetwork({
+                        type:"chat",
+                        message:text
+                    });
+
+                }
+
+                input.remove();
+                chatOpen=false;
+
+            }
+
+            if(e.key==="Escape"){
+
+                input.remove();
+                chatOpen=false;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   VOIDFALL AUDIO SYSTEM — procedural SFX + LOFI
+   No external audio files required.
+   ========================================================= */
+const VF_AUDIO={
+    ctx:null, master:null, music:null, enabled:true, started:false,
+    init(){
+        if(this.started) return;
+        try{
+            const AC=window.AudioContext||window.webkitAudioContext;
+            if(!AC) return;
+            this.ctx=new AC();
+            this.master=this.ctx.createGain();
+            this.master.gain.value=.42;
+            this.master.connect(this.ctx.destination);
+            this.started=true;
+            this.startLofi();
+        }catch(e){}
+    },
+    resume(){
+        if(this.ctx && this.ctx.state==='suspended') this.ctx.resume();
+    },
+    tone(freq,dur,type='sine',vol=.08,when=0,slide=0){
+        if(!this.enabled||!this.ctx||!this.master) return;
+        const t=this.ctx.currentTime+when;
+        const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+        o.type=type; o.frequency.setValueAtTime(freq,t);
+        if(slide) o.frequency.exponentialRampToValueAtTime(Math.max(20,freq+slide),t+dur);
+        g.gain.setValueAtTime(.0001,t);
+        g.gain.exponentialRampToValueAtTime(Math.max(.0001,vol),t+.008);
+        g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+        o.connect(g); g.connect(this.master); o.start(t); o.stop(t+dur+.03);
+    },
+    noise(dur=.08,vol=.06,when=0){
+        if(!this.enabled||!this.ctx||!this.master) return;
+        const t=this.ctx.currentTime+when, n=this.ctx.createBufferSource();
+        const b=this.ctx.createBuffer(1,this.ctx.sampleRate*dur,this.ctx.sampleRate), d=b.getChannelData(0);
+        for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+        const g=this.ctx.createGain(); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+        n.buffer=b; n.connect(g); g.connect(this.master); n.start(t);
+    },
+    sfx(name){
+        this.resume();
+        if(!this.ctx) return;
+        if(name==='shoot'){this.tone(520,.055,'square',.035,0,220);this.noise(.025,.025);}
+        else if(name==='melee'){this.tone(180,.12,'sawtooth',.07,0,380);this.noise(.06,.04,.01);}
+        else if(name==='crystal'){this.tone(740,.12,'triangle',.06);this.tone(980,.16,'triangle',.045,.06);}
+        else if(name==='pickup'){this.tone(660,.08,'triangle',.055);this.tone(990,.12,'triangle',.05,.07);}
+        else if(name==='chest'){this.tone(330,.12,'triangle',.06);this.tone(520,.16,'triangle',.055,.10);this.tone(780,.22,'triangle',.06,.22);}
+        else if(name==='hit'){this.noise(.07,.055);this.tone(120,.08,'square',.035);}
+        else if(name==='kill'){this.tone(260,.10,'sawtooth',.05);this.tone(520,.18,'triangle',.055,.08);}
+        else if(name==='level'){[523,659,784,1047].forEach((f,i)=>this.tone(f,.18,'triangle',.055,i*.09));}
+        else if(name==='save'){this.tone(520,.08,'sine',.04);this.tone(780,.14,'sine',.045,.08);}
+        else if(name==='dash'){this.tone(240,.12,'sawtooth',.035,0,520);this.noise(.05,.025);}
+        else if(name==='weather'){this.noise(.25,.025);this.tone(70,.5,'sine',.025,0,-15);}
+        else if(name==='thunder'){this.noise(.7,.09);this.tone(55,.65,'sawtooth',.06,0,-25);}
+        else if(name==='pause'){this.tone(220,.14,'sine',.035);}
+        else if(name==='shop'){this.tone(440,.08,'triangle',.045);this.tone(660,.12,'triangle',.04,.08);}
+    },
+    startLofi(){
+        if(this.music||!this.ctx) return;
+        const gain=this.ctx.createGain(); gain.gain.value=.075; gain.connect(this.master); this.music=gain;
+        const notes=[146.83,174.61,220,261.63,220,174.61,164.81,196];
+        let step=0;
+        const tick=()=>{
+            if(!this.ctx||!this.music) return;
+            const t=this.ctx.currentTime;
+            const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+            o.type='triangle'; o.frequency.value=notes[step%notes.length];
+            g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.7,t+.025); g.gain.exponentialRampToValueAtTime(.0001,t+1.65);
+            o.connect(g); g.connect(this.music); o.start(t); o.stop(t+1.7);
+            if(step%4===0){
+                const bass=this.ctx.createOscillator(), bg=this.ctx.createGain(); bass.type='sine'; bass.frequency.value=notes[step%notes.length]/2;
+                bg.gain.setValueAtTime(.0001,t); bg.gain.exponentialRampToValueAtTime(.45,t+.03); bg.gain.exponentialRampToValueAtTime(.0001,t+1.45);
+                bass.connect(bg); bg.connect(this.music); bass.start(t); bass.stop(t+1.5);
+            }
+            if(step%2===1){
+                const n=this.ctx.createBufferSource(); const b=this.ctx.createBuffer(1,this.ctx.sampleRate*.035,this.ctx.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3); n.buffer=b; const ng=this.ctx.createGain(); ng.gain.value=.12; n.connect(ng); ng.connect(this.music); n.start(t+.82);
+            }
+            step++; setTimeout(tick,1700);
+        };
+        tick();
+    },
+    toggle(){
+        this.enabled=!this.enabled;
+        if(this.music) this.music.gain.value=this.enabled?.075:0;
+        showToast(this.enabled?'AUDIO: ON':'AUDIO: OFF');
+    }
+};
+
+/* =========================================================
+   PLAYER ATTACK / ITEM USE
+   ========================================================= */
+
+function attack(){
+
+    if(gameState!=="game" || paused || chatOpen){
+        return;
+    }
+
+    /* CRYSTAL-PVP ITEM SLOTS */
+    if(player.selectedSlot===0){
+        VF_AUDIO.sfx('crystal');
+        placeCrystal();
+        return;
+    }
+
+    if(player.selectedSlot===1){
+        VF_AUDIO.sfx('crystal');
+        placeObsidian();
+        return;
+    }
+
+    const weaponIndex=player.selectedSlot-2;
+    const weapon=weapons[weaponIndex];
+
+    if(!weapon || player.fireCooldown>0){
+        return;
+    }
+
+    player.weapon=weaponIndex;
+    player.fireCooldown=weapon.cooldown/(1+upgrades.fireRate*.12);
+
+    player.angle=Math.atan2(mouse.y-HEIGHT/2,mouse.x-WIDTH/2);
+
+    if(weapon.type==="melee"){
+
+        VF_AUDIO.sfx('melee');
+        meleeAttack(weapon);
+
+        sendNetwork({
+            type:"attack",
+            weapon:player.weapon,
+            x:player.x,
+            y:player.y,
+            angle:player.angle
+        });
+
+        return;
+    }
+
+    for(let i=0;i<weapon.pellets;i++){
+
+        const a=player.angle+rand(-weapon.spread,weapon.spread);
+
+        bullets.push({
+            x:player.x+Math.cos(a)*28,
+            y:player.y+Math.sin(a)*28,
+            vx:Math.cos(a)*weapon.speed,
+            vy:Math.sin(a)*weapon.speed,
+            life:weapon.range/weapon.speed,
+            damage:weapon.damage*(1+upgrades.damage*.12),
+            weapon:player.weapon
+        });
+
+    }
+
+    VF_AUDIO.sfx('shoot');
+    muzzleFlash();
+    shake=Math.max(shake,player.weapon===2?8:3);
+
+    sendNetwork({
+        type:"attack",
+        weapon:player.weapon,
+        x:player.x,
+        y:player.y,
+        angle:player.angle
+    });
+
+}
+
+/* =========================================================
+   MUZZLE FLASH
+   ========================================================= */
+
+function muzzleFlash(){
+
+    const x=
+        player.x+
+        Math.cos(player.angle)*35;
+
+    const y=
+        player.y+
+        Math.sin(player.angle)*35;
+
+    for(let i=0;i<7;i++){
+
+        particle(
+            x,
+            y,
+            {
+                vx:
+                    Math.cos(player.angle)*
+                    rand(80,220)+
+                    rand(-50,50),
+
+                vy:
+                    Math.sin(player.angle)*
+                    rand(80,220)+
+                    rand(-50,50),
+
+                life:rand(.08,.3),
+
+                size:rand(2,6)
+            }
+        );
+
+    }
+
+}
+
+/* =========================================================
+   MELEE
+   ========================================================= */
+
+function meleeAttack(weapon){
+
+    for(const enemy of enemies){
+
+        if(enemy.dead){
+            continue;
+        }
+
+        const d=
+            distance(
+                player.x,
+                player.y,
+                enemy.x,
+                enemy.y
+            );
+
+        const a=
+            Math.atan2(
+                enemy.y-player.y,
+                enemy.x-player.x
+            );
+
+        const diff=
+            angleDifference(
+                a,
+                player.angle
+            );
+
+        if(
+            d<weapon.range &&
+            diff<1.05
+        ){
+
+            damageEnemy(
+                enemy,
+                weapon.damage*
+                (1+upgrades.damage*.12)
+            );
+
+            explosion(
+                enemy.x,
+                enemy.y,
+                12
+            );
+
+        }
+
+    }
+
+    shake=7;
+
+}
+
+/* =========================================================
+   DAMAGE ENEMY
+   ========================================================= */
+
+function damageEnemy(enemy,damage){
+
+    if(
+        !enemy ||
+        enemy.dead
+    ){
+        return;
+    }
+
+    enemy.health-=damage;
+    enemy.hit=.14;
+
+    if(enemy.health<=0){
+
+        enemy.dead=true;
+
+        player.kills++;
+
+        player.score+=
+            Math.round(
+                enemy.maxHealth/2
+            );
+
+        player.money+=
+            enemy.type===4
+            ?500
+            :10+enemy.type*8;
+
+        gainXP(
+            enemy.type===4
+            ?enemy.maxHealth*.15
+            :enemy.maxHealth*.2
+        );
+
+        VF_AUDIO.sfx('kill');
+        explosion(
+            enemy.x,
+            enemy.y,
+            enemy.type===4
+            ?55
+            :20
+        );
+
+        if(Math.random()<.35){
+
+            drops.push({
+                x:enemy.x,
+                y:enemy.y,
+                type:
+                    Math.random()<.5
+                    ?"crystal"
+                    :"metal",
+                life:30
+            });
+
+        }
+
+    }
+
+}
+
+/* =========================================================
+   XP
+   ========================================================= */
+
+function gainXP(amount){
+
+    player.xp+=amount;
+
+    while(
+        player.xp>=
+        player.level*120
+    ){
+
+        player.xp-=
+            player.level*120;
+
+        player.level++;
+
+        player.maxHealth+=5;
+        player.maxShield+=4;
+
+        player.health=
+            player.maxHealth;
+
+        player.shield=
+            player.maxShield;
+
+        showToast(
+            "LEVEL "+
+            player.level+
+            " // SYSTEM UPGRADE"
+        );
+
+    }
+
+}
+
+/* =========================================================
+   PLAYER DAMAGE
+   ========================================================= */
+
+function damagePlayer(amount){
+
+    if(inSafeZone()){
+        return;
+    }
+
+    let remaining=amount;
+
+    if(player.shield>0){
+
+        const absorbed=
+            Math.min(
+                player.shield,
+                remaining
+            );
+
+        player.shield-=absorbed;
+
+        remaining-=absorbed;
+
+    }
+
+    player.health-=remaining;
+    VF_AUDIO.sfx('hit');
+
+    damageFlash=.3;
+
+    shake=10;
+
+    if(player.health<=0){
+
+        player.health=
+            player.maxHealth*.55;
+
+        player.shield=
+            player.maxShield*.5;
+
+        player.x=4500;
+        player.y=4500;
+
+        player.money=
+            Math.max(
+                0,
+                player.money-50
+            );
+
+        showToast(
+            "RECONSTRUCTED AT SANCTUARY"
+        );
+
+    }
+
+}
+
+/* =========================================================
+   DASH
+   ========================================================= */
+
+function dash(){
+
+    if(
+        player.dashCooldown>0 ||
+        player.energy<25
+    ){
+        return;
+    }
+
+    let dx=
+        (keys.KeyD?1:0)-
+        (keys.KeyA?1:0);
+
+    let dy=
+        (keys.KeyS?1:0)-
+        (keys.KeyW?1:0);
+
+    const len=
+        Math.hypot(dx,dy);
+
+    if(!len){
+        return;
+    }
+
+    dx/=len;
+    dy/=len;
+
+    player.energy-=25;
+
+    player.dashCooldown=.8;
+
+    player.x=
+        clamp(
+            player.x+dx*280,
+            40,
+            world.width-40
+        );
+
+    player.y=
+        clamp(
+            player.y+dy*280,
+            40,
+            world.height-40
+        );
+
+    for(let i=0;i<24;i++){
+
+        particle(
+            player.x,
+            player.y,
+            {
+                vx:rand(-140,140),
+                vy:rand(-140,140),
+                life:rand(.2,.55),
+                size:rand(3,8)
+            }
+        );
+
+    }
+
+    shake=8;
+
+}
+
+/* =========================================================
+   UPDATE
+   ========================================================= */
+
+function update(dt){
+
+    if(
+        gameState!=="game" ||
+        paused
+    ){
+        return;
+    }
+
+    worldTime+=dt;
+    updateWeather(dt);
+
+    player.fireCooldown=
+        Math.max(
+            0,
+            player.fireCooldown-dt
+        );
+
+    player.dashCooldown=
+        Math.max(
+            0,
+            player.dashCooldown-dt
+        );
+
+    shake=
+        Math.max(
+            0,
+            shake-dt*20
+        );
+
+    damageFlash=
+        Math.max(
+            0,
+            damageFlash-dt
+        );
+
+    let dx=
+        (keys.KeyD?1:0)-
+        (keys.KeyA?1:0);
+
+    let dy=
+        (keys.KeyS?1:0)-
+        (keys.KeyW?1:0);
+
+    const len=
+        Math.hypot(dx,dy)||1;
+
+    let speed=
+        player.speed*
+        (1+upgrades.speed*.06);
+
+    if(
+        keys.ShiftLeft ||
+        keys.ShiftRight
+    ){
+        speed*=1.45;
+    }
+
+    player.x=
+        clamp(
+            player.x+
+            dx/len*
+            speed*
+            dt,
+            40,
+            world.width-40
+        );
+
+    player.y=
+        clamp(
+            player.y+
+            dy/len*
+            speed*
+            dt,
+            40,
+            world.height-40
+        );
+
+    resolveWorldCollision();
+
+    if(keys.Space){
+
+        keys.Space=false;
+
+        dash();
+
+    }
+
+    player.angle=
+        Math.atan2(
+            mouse.y-HEIGHT/2,
+            mouse.x-WIDTH/2
+        );
+
+    if(inSafeZone()){
+
+        player.health=
+            Math.min(
+                player.maxHealth,
+                player.health+
+                (7+upgrades.regen)*
+                dt
+            );
+
+        player.shield=
+            Math.min(
+                player.maxShield,
+                player.shield+
+                (10+upgrades.shieldRegen)*
+                dt
+            );
+
+        player.energy=
+            Math.min(
+                player.maxEnergy,
+                player.energy+
+                22*dt
+            );
+
+    }
+    else{
+
+        player.energy=
+            Math.min(
+                player.maxEnergy,
+                player.energy+
+                9*dt
+            );
+
+    }
+
+    /* ENEMIES */
+
+    for(const enemy of enemies){
+
+        if(enemy.dead){
+            continue;
+        }
+
+        enemy.hit=
+            Math.max(
+                0,
+                enemy.hit-dt
+            );
+
+        enemy.attackCooldown-=dt;
+
+        const d=
+            distance(
+                enemy.x,
+                enemy.y,
+                player.x,
+                player.y
+            );
+
+        const a=
+            Math.atan2(
+                player.y-enemy.y,
+                player.x-enemy.x
+            );
+
+        if(
+            distance(
+                enemy.x,
+                enemy.y,
+                4500,
+                4500
+            )<420
+        ){
+
+            enemy.x-=
+                Math.cos(a)*
+                enemy.speed*
+                dt*
+                1.8;
+
+            enemy.y-=
+                Math.sin(a)*
+                enemy.speed*
+                dt*
+                1.8;
+
+            continue;
+
+        }
+
+        if(
+            d>
+            enemy.radius+
+            player.radius+
+            7
+        ){
+
+            enemy.x+=
+                Math.cos(a)*
+                enemy.speed*
+                dt;
+
+            enemy.y+=
+                Math.sin(a)*
+                enemy.speed*
+                dt;
+
+        }
+        else if(
+            enemy.attackCooldown<=0
+        ){
+
+            enemy.attackCooldown=
+                enemy.type===4
+                ?1.1
+                :.85;
+
+            damagePlayer(
+                enemy.damage
+            );
+
+        }
+
+        enemy.phase+=
+            dt*
+            (1+enemy.type*.2);
+
+    }
+
+    /* BULLETS */
+
+    for(
+        let i=bullets.length-1;
+        i>=0;
+        i--
+    ){
+
+        const bullet=bullets[i];
+
+        bullet.x+=bullet.vx*dt;
+        bullet.y+=bullet.vy*dt;
+
+        bullet.life-=dt;
+
+        let hit=false;
+
+        for(const enemy of enemies){
+
+            if(enemy.dead){
+                continue;
+            }
+
+            if(
+                distance(
+                    bullet.x,
+                    bullet.y,
+                    enemy.x,
+                    enemy.y
+                )<
+                enemy.radius+6
+            ){
+
+                damageEnemy(
+                    enemy,
+                    bullet.damage
+                );
+
+                explosion(
+                    bullet.x,
+                    bullet.y,
+                    5
+                );
+
+                hit=true;
+
+                break;
+
+            }
+
+        }
+
+        if(
+            hit ||
+            bullet.life<=0
+        ){
+
+            bullets.splice(i,1);
+
+        }
+
+    }
+
+    /* PARTICLES */
+
+    for(
+        let i=particles.length-1;
+        i>=0;
+        i--
+    ){
+
+        const part=particles[i];
+
+        part.x+=part.vx*dt;
+        part.y+=part.vy*dt;
+
+        part.vx*=.96;
+        part.vy*=.96;
+
+        part.life-=dt;
+
+        if(part.life<=0){
+            particles.splice(i,1);
+        }
+
+    }
+
+    /* DROPS */
+
+    for(
+        let i=drops.length-1;
+        i>=0;
+        i--
+    ){
+
+        const drop=drops[i];
+
+        drop.life-=dt;
+
+        if(
+            distance(
+                player.x,
+                player.y,
+                drop.x,
+                drop.y
+            )<45
+        ){
+
+            inventory[drop.type]++;
+            VF_AUDIO.sfx('pickup');
+
+            showToast(
+                "ACQUIRED "+
+                drop.type.toUpperCase()
+            );
+
+            drops.splice(i,1);
+
+        }
+        else if(drop.life<=0){
+
+            drops.splice(i,1);
+
+        }
+
+    }
+
+    /* OTHER PLAYERS */
+
+    for(
+        const [name,other]
+        of otherPlayers
+    ){
+
+        if(other.x!==undefined){
+
+            other.renderX+=
+                (other.x-other.renderX)*
+                Math.min(1,dt*8);
+
+            other.renderY+=
+                (other.y-other.renderY)*
+                Math.min(1,dt*8);
+
+        }
+
+    }
+
+    /* RANDOM SPAWNS */
+
+    if(
+        Math.random()<
+        dt*
+        (.18+player.wave*.012)
+    ){
+
+        spawnEnemy(
+            Math.random()<.15
+            ?1
+            :0
+        );
+
+    }
+
+    /* NEXT WAVE */
+
+    if(
+        enemies.filter(
+            e=>!e.dead
+        ).length===0
+    ){
+
+        player.wave++;
+
+        showToast(
+            "WAVE "+
+            player.wave
+        );
+
+        spawnWave();
+
+    }
+
+    if(connected){
+
+        sendNetwork({
+            type:"position",
+
+            x:player.x,
+            y:player.y,
+
+            angle:player.angle,
+
+            health:player.health,
+            shield:player.shield,
+
+            level:player.level,
+
+            score:player.score
+
+        });
+
+    }
+
+}
+
+/* =========================================================
+   WORLD TO SCREEN
+   ========================================================= */
+
+function worldToScreen(x,y){
+
+    return {
+
+        x:x-player.x+WIDTH/2,
+
+        y:y-player.y+HEIGHT/2
+
+    };
+
+}
+
+/* =========================================================
+   BACKGROUND
+   ========================================================= */
+
+function drawBackground(){
+
+    const gradient=
+        ctx.createRadialGradient(
+            WIDTH/2,
+            HEIGHT/2,
+            40,
+            WIDTH/2,
+            HEIGHT/2,
+            Math.max(WIDTH,HEIGHT)*.8
+        );
+
+    gradient.addColorStop(
+        0,
+        "#14263b"
+    );
+
+    gradient.addColorStop(
+        .45,
+        "#08121f"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#020409"
+    );
+
+    ctx.fillStyle=gradient;
+
+    ctx.fillRect(
+        -20,
+        -20,
+        WIDTH+40,
+        HEIGHT+40
+    );
+
+}
+
+function drawStars(){
+
+    for(const star of stars){
+
+        const twinkle=
+            .55+
+            Math.sin(
+                worldTime*1.4+
+                star.x*20
+            )*.25;
+
+        ctx.globalAlpha=
+            star.alpha*
+            twinkle;
+
+        ctx.fillStyle="#9fc7e8";
+
+        ctx.fillRect(
+            star.x*WIDTH,
+            star.y*HEIGHT,
+            star.size,
+            star.size
+        );
+
+    }
+
+    ctx.globalAlpha=1;
+
+}
+
+function drawTerrain(){
+
+    const grid=90;
+
+    const offsetX=
+        ((player.x%grid)+grid)%grid;
+
+    const offsetY=
+        ((player.y%grid)+grid)%grid;
+
+    ctx.strokeStyle=
+        "rgba(65,105,132,.17)";
+
+    ctx.lineWidth=1;
+
+    for(
+        let x=-offsetX;
+        x<WIDTH;
+        x+=grid
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(x,0);
+        ctx.lineTo(x,HEIGHT);
+
+        ctx.stroke();
+
+    }
+
+    for(
+        let y=-offsetY;
+        y<HEIGHT;
+        y+=grid
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(0,y);
+        ctx.lineTo(WIDTH,y);
+
+        ctx.stroke();
+
+    }
+
+    for(let gx=-2;gx<10;gx++){
+
+        for(let gy=-2;gy<10;gy++){
+
+            const wx=
+                Math.floor(player.x/grid)+gx;
+
+            const wy=
+                Math.floor(player.y/grid)+gy;
+
+            const noise=
+                Math.abs(
+                    Math.sin(
+                        wx*12.73+
+                        wy*5.31
+                    )
+                );
+
+            const size=
+                45+
+                noise*30;
+
+            const pos=
+                worldToScreen(
+                    wx*grid+30,
+                    wy*grid+30
+                );
+
+            ctx.fillStyle=
+                "rgba(13,28,41,.5)";
+
+            ctx.fillRect(
+                pos.x,
+                pos.y,
+                size,
+                size
+            );
+
+        }
+
+    }
+
+}
+
+function drawStructures(){
+
+    for(let i=0;i<32;i++){
+
+        const a=
+            i*2.399+
+            world.seed*.0001;
+
+        const radius=
+            900+
+            (i%8)*220;
+
+        const x=
+            4500+
+            Math.cos(a)*radius;
+
+        const y=
+            4500+
+            Math.sin(a)*radius;
+
+        const s=
+            worldToScreen(x,y);
+
+        if(
+            s.x<-150 ||
+            s.x>WIDTH+150 ||
+            s.y<-150 ||
+            s.y>HEIGHT+150
+        ){
+            continue;
+        }
+
+        ctx.save();
+
+        ctx.translate(
+            s.x,
+            s.y
+        );
+
+        ctx.rotate(a);
+
+        ctx.strokeStyle=
+            "rgba(74,132,162,.34)";
+
+        ctx.lineWidth=3;
+
+        ctx.strokeRect(
+            -38,
+            -38,
+            76,
+            76
+        );
+
+        ctx.strokeStyle=
+            "rgba(103,210,242,.18)";
+
+        ctx.strokeRect(
+            -20,
+            -20,
+            40,
+            40
+        );
+
+        ctx.fillStyle=
+            "rgba(54,151,194,.05)";
+
+        ctx.fillRect(
+            -34,
+            -34,
+            68,
+            68
+        );
+
+        ctx.restore();
+
+    }
+
+}
+
+/* =========================================================
+   WORLD FEATURES
+   ========================================================= */
+
+function drawWorldFeatures(){
+    for(const tree of trees){
+        const s=worldToScreen(tree.x,tree.y);
+        if(s.x<-80||s.x>WIDTH+80||s.y<-100||s.y>HEIGHT+100) continue;
+
+        const sway=Math.sin(worldTime*1.5+tree.phase)*2;
+
+        ctx.save();
+        ctx.translate(s.x,s.y);
+        ctx.fillStyle="#17120e";
+        ctx.fillRect(-5,4,10,28);
+
+        ctx.shadowBlur=12;
+        ctx.shadowColor="#4e9d68";
+        ctx.fillStyle="#193b2c";
+        ctx.beginPath();
+        ctx.arc(sway,-10,tree.size,0,TAU);
+        ctx.fill();
+
+        ctx.fillStyle="#285a3a";
+        ctx.beginPath();
+        ctx.arc(-tree.size*.35,-18,tree.size*.65,0,TAU);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    for(const rock of obstacles){
+        const s=worldToScreen(rock.x,rock.y);
+        if(s.x<-80||s.x>WIDTH+80||s.y<-80||s.y>HEIGHT+80) continue;
+
+        ctx.save();
+        ctx.translate(s.x,s.y);
+        ctx.rotate(rock.phase);
+        ctx.fillStyle=rock.kind==="rock"?"#344451":"#26323d";
+        ctx.strokeStyle="#63798a";
+        ctx.lineWidth=2;
+
+        ctx.beginPath();
+        ctx.moveTo(-rock.radius*.9,rock.radius*.35);
+        ctx.lineTo(-rock.radius*.35,-rock.radius*.8);
+        ctx.lineTo(rock.radius*.65,-rock.radius*.65);
+        ctx.lineTo(rock.radius,rock.radius*.25);
+        ctx.lineTo(rock.radius*.15,rock.radius*.8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    for(const chest of chests){
+        if(chest.opened) continue;
+
+        const s=worldToScreen(chest.x,chest.y);
+        if(s.x<-70||s.x>WIDTH+70||s.y<-70||s.y>HEIGHT+70) continue;
+
+        const pulse=Math.sin(worldTime*4+chest.phase)*2;
+
+        ctx.save();
+        ctx.translate(s.x,s.y+pulse);
+        ctx.shadowBlur=18;
+        ctx.shadowColor="#ffd45c";
+        ctx.fillStyle="#68451a";
+        ctx.fillRect(-19,-11,38,24);
+        ctx.fillStyle="#dca83f";
+        ctx.fillRect(-19,-11,38,6);
+        ctx.strokeStyle="#ffe49a";
+        ctx.strokeRect(-19,-11,38,24);
+        ctx.fillStyle="#fff0a8";
+        ctx.fillRect(-3,-7,6,9);
+        ctx.restore();
+
+        ctx.fillStyle="#ffe28a";
+        ctx.font="9px Arial";
+        ctx.textAlign="center";
+        ctx.fillText("CHEST",s.x,s.y-24);
+    }
+
+    for(const site of rescueSites){
+        if(site.rescued) continue;
+
+        const s=worldToScreen(site.x,site.y);
+        if(s.x<-90||s.x>WIDTH+90||s.y<-90||s.y>HEIGHT+90) continue;
+
+        const pulse=4+Math.sin(worldTime*4+site.pulse)*3;
+
+        ctx.save();
+        ctx.translate(s.x,s.y);
+
+        ctx.shadowBlur=20;
+        ctx.shadowColor="#70e8ff";
+        ctx.strokeStyle="#72eaff";
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.arc(0,0,18+pulse,0,TAU);
+        ctx.stroke();
+
+        ctx.fillStyle="#091522";
+        ctx.beginPath();
+        ctx.arc(0,0,11,0,TAU);
+        ctx.fill();
+
+        ctx.fillStyle="#8fefff";
+        ctx.font="900 18px Arial";
+        ctx.textAlign="center";
+        ctx.textBaseline="middle";
+        ctx.fillText("?",0,1);
+
+        ctx.restore();
+
+        ctx.fillStyle="#8fefff";
+        ctx.font="9px Arial";
+        ctx.textAlign="center";
+        ctx.fillText("SURVIVOR",s.x,s.y-28);
+    }
+}
+
+function drawWeather(){
+    if(weather.type==="rain" || weather.type==="storm"){
+        ctx.save();
+        ctx.strokeStyle=weather.type==="storm"
+            ?"rgba(130,190,255,.32)"
+            :"rgba(100,180,255,.20)";
+        ctx.lineWidth=1;
+
+        const amount=weather.type==="storm"?180:110;
+
+        for(let i=0;i<amount;i++){
+            const x=(i*83+worldTime*280)% (WIDTH+120)-60;
+            const y=(i*47+worldTime*520)% (HEIGHT+120)-60;
+
+            ctx.beginPath();
+            ctx.moveTo(x,y);
+            ctx.lineTo(x-7,y+20);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    if(weather.type==="fog"){
+        const fog=ctx.createRadialGradient(
+            WIDTH/2,HEIGHT/2,100,
+            WIDTH/2,HEIGHT/2,Math.max(WIDTH,HEIGHT)*.75
+        );
+        fog.addColorStop(0,"rgba(130,155,170,.03)");
+        fog.addColorStop(1,"rgba(120,145,160,.28)");
+        ctx.fillStyle=fog;
+        ctx.fillRect(0,0,WIDTH,HEIGHT);
+    }
+
+    if(weather.type==="storm"){
+        ctx.fillStyle="rgba(40,55,90,.10)";
+        ctx.fillRect(0,0,WIDTH,HEIGHT);
+
+        if(weather.lightning>0){
+            ctx.save();
+            ctx.strokeStyle="rgba(220,245,255,.9)";
+            ctx.shadowBlur=20;
+            ctx.shadowColor="#bfeaff";
+            ctx.lineWidth=3;
+
+            const x=WIDTH*.2+
+                Math.sin(worldTime*9)*WIDTH*.6;
+
+            ctx.beginPath();
+            ctx.moveTo(x,0);
+            ctx.lineTo(x-35,HEIGHT*.25);
+            ctx.lineTo(x+20,HEIGHT*.45);
+            ctx.lineTo(x-20,HEIGHT*.7);
+            ctx.lineTo(x+5,HEIGHT);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+    }
+
+    if(weather.flash>0){
+        ctx.fillStyle="rgba(220,245,255,"+
+            weather.flash*.18+
+            ")";
+        ctx.fillRect(0,0,WIDTH,HEIGHT);
+    }
+
+    ctx.fillStyle="#91aabd";
+    ctx.font="10px Arial";
+    ctx.textAlign="right";
+    ctx.fillText(
+        "WEATHER // "+weather.type.toUpperCase(),
+        WIDTH-20,
+        HEIGHT-42
+    );
+}
+
+/* =========================================================
+   SAFE ZONE
+   ========================================================= */
+
+function drawSafeZone(){
+
+    const s=
+        worldToScreen(
+            4500,
+            4500
+        );
+
+    const gradient=
+        ctx.createRadialGradient(
+            s.x,
+            s.y,
+            70,
+            s.x,
+            s.y,
+            450
+        );
+
+    gradient.addColorStop(
+        0,
+        "rgba(83,220,255,.08)"
+    );
+
+    gradient.addColorStop(
+        .7,
+        "rgba(64,170,255,.035)"
+    );
+
+    gradient.addColorStop(
+        1,
+        "rgba(60,170,255,0)"
+    );
+
+    ctx.fillStyle=gradient;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        s.x,
+        s.y,
+        450,
+        0,
+        TAU
+    );
+
+    ctx.fill();
+
+    ctx.strokeStyle=
+        "rgba(108,227,255,.4)";
+
+    ctx.lineWidth=2;
+
+    ctx.setLineDash([
+        10,
+        15
+    ]);
+
+    ctx.beginPath();
+
+    ctx.arc(
+        s.x,
+        s.y,
+        420,
+        0,
+        TAU
+    );
+
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+
+    ctx.fillStyle=
+        "rgba(158,239,255,.8)";
+
+    ctx.font=
+        "900 10px Arial";
+
+    ctx.textAlign="center";
+
+    ctx.fillText(
+        "SANCTUARY // SAFE ZONE",
+        s.x,
+        s.y-430
+    );
+
+}
+
+/* =========================================================
+   OBSIDIAN
+   ========================================================= */
+
+function drawObsidian(){
+
+    for(const block of obsidianBlocks){
+
+        const s=
+            worldToScreen(
+                block.x,
+                block.y
+            );
+
+        if(
+            s.x<-70 ||
+            s.x>WIDTH+70 ||
+            s.y<-70 ||
+            s.y>HEIGHT+70
+        ){
+            continue;
+        }
+
+        ctx.save();
+
+        ctx.translate(
+            s.x,
+            s.y
+        );
+
+        ctx.shadowBlur=16;
+        ctx.shadowColor="#080b16";
+
+        /* ground shadow */
+
+        ctx.fillStyle=
+            "rgba(0,0,0,.7)";
+
+        ctx.fillRect(
+            -24,
+            -24,
+            48,
+            48
+        );
+
+        /* obsidian block */
+
+        const gradient=
+            ctx.createLinearGradient(
+                -22,
+                -22,
+                22,
+                22
+            );
+
+        gradient.addColorStop(
+            0,
+            "#1b1830"
+        );
+
+        gradient.addColorStop(
+            .5,
+            "#090914"
+        );
+
+        gradient.addColorStop(
+            1,
+            "#24203e"
+        );
+
+        ctx.fillStyle=gradient;
+
+        ctx.fillRect(
+            -21,
+            -21,
+            42,
+            42
+        );
+
+        ctx.shadowBlur=0;
+
+        ctx.strokeStyle=
+            "rgba(122,92,180,.75)";
+
+        ctx.lineWidth=2;
+
+        ctx.strokeRect(
+            -21,
+            -21,
+            42,
+            42
+        );
+
+        /* purple crystalline cracks */
+
+        ctx.strokeStyle=
+            "rgba(160,101,255,.45)";
+
+        ctx.lineWidth=1.5;
+
+        ctx.beginPath();
+
+        ctx.moveTo(-15,-12);
+        ctx.lineTo(-4,-3);
+        ctx.lineTo(-12,12);
+
+        ctx.moveTo(8,-16);
+        ctx.lineTo(3,-4);
+        ctx.lineTo(15,9);
+
+        ctx.moveTo(-2,0);
+        ctx.lineTo(10,4);
+
+        ctx.stroke();
+
+        ctx.restore();
+
+    }
+
+}
+
+/* =========================================================
+   END CRYSTALS
+   ========================================================= */
+
+function drawEndCrystals(){
+
+    for(const crystal of endCrystals){
+
+        const s=
+            worldToScreen(
+                crystal.x,
+                crystal.y
+            );
+
+        if(
+            s.x<-100 ||
+            s.x>WIDTH+100 ||
+            s.y<-100 ||
+            s.y>HEIGHT+100
+        ){
+            continue;
+        }
+
+        const pulse=
+            Math.sin(
+                worldTime*5+
+                crystal.pulse
+            );
+
+        const float=
+            Math.sin(
+                worldTime*3+
+                crystal.pulse
+            )*5;
+
+        ctx.save();
+
+        ctx.translate(
+            s.x,
+            s.y+float
+        );
+
+        /* energy aura */
+
+        ctx.shadowBlur=
+            35+
+            pulse*8;
+
+        ctx.shadowColor="#d66cff";
+
+        ctx.fillStyle=
+            "rgba(176,74,255,.12)";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            30+
+            pulse*3,
+            0,
+            TAU
+        );
+
+        ctx.fill();
+
+        /* crystal */
+
+        ctx.rotate(
+            worldTime*.8+
+            crystal.pulse
+        );
+
+        ctx.fillStyle="#b968ff";
+
+        ctx.strokeStyle="#e6b7ff";
+
+        ctx.lineWidth=2;
+
+        ctx.beginPath();
+
+        ctx.moveTo(0,-19);
+        ctx.lineTo(11,-5);
+        ctx.lineTo(8,15);
+        ctx.lineTo(0,21);
+        ctx.lineTo(-8,15);
+        ctx.lineTo(-11,-5);
+
+        ctx.closePath();
+
+        ctx.fill();
+        ctx.stroke();
+
+        /* inner core */
+
+        ctx.fillStyle="#f4dcff";
+
+        ctx.beginPath();
+
+        ctx.moveTo(0,-10);
+        ctx.lineTo(5,0);
+        ctx.lineTo(0,10);
+        ctx.lineTo(-5,0);
+
+        ctx.closePath();
+
+        ctx.fill();
+
+        ctx.restore();
+
+        /* beam connecting crystal to obsidian */
+
+        ctx.save();
+
+        ctx.strokeStyle=
+            "rgba(192,104,255,.4)";
+
+        ctx.lineWidth=2;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            s.x,
+            s.y+15
+        );
+
+        ctx.lineTo(
+            s.x,
+            s.y+float
+        );
+
+        ctx.stroke();
+
+        ctx.restore();
+
+    }
+
+}
+
+/* =========================================================
+   PLAYER
+   ========================================================= */
+
+function drawPlayer(){
+
+    const x=WIDTH/2;
+    const y=HEIGHT/2;
+
+    const a=player.angle;
+
+    ctx.save();
+
+    ctx.translate(x,y);
+    ctx.rotate(a);
+
+    ctx.shadowBlur=30;
+    ctx.shadowColor="#5bdfff";
+
+    ctx.fillStyle="#0b1825";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        0,
+        0,
+        player.radius+5,
+        0,
+        TAU
+    );
+
+    ctx.fill();
+
+    ctx.shadowBlur=0;
+
+    ctx.fillStyle="#9fefff";
+
+    ctx.beginPath();
+
+    ctx.moveTo(27,0);
+    ctx.lineTo(-13,-13);
+    ctx.lineTo(-7,0);
+    ctx.lineTo(-13,13);
+
+    ctx.closePath();
+
+    ctx.fill();
+
+    ctx.strokeStyle="#49d9ff";
+    ctx.lineWidth=2;
+
+    ctx.stroke();
+
+    ctx.fillStyle="#08131e";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        -3,
+        0,
+        7,
+        0,
+        TAU
+    );
+
+    ctx.fill();
+
+    if(player.selectedSlot>=5 && player.selectedSlot<7){
+
+        ctx.strokeStyle="#d9f9ff";
+
+        ctx.lineWidth=
+            player.selectedSlot===4
+            ?4
+            :3;
+
+        ctx.beginPath();
+
+        ctx.moveTo(8,0);
+
+        ctx.lineTo(
+            player.selectedSlot===6
+            ?64
+            :50,
+            0
+        );
+
+        ctx.stroke();
+
+    }
+
+    ctx.restore();
+
+}
+
+/* =========================================================
+   ENEMIES
+   ========================================================= */
+
+function drawEnemies(){
+
+    for(const enemy of enemies){
+
+        if(enemy.dead){
+            continue;
+        }
+
+        const s=
+            worldToScreen(
+                enemy.x,
+                enemy.y
+            );
+
+        if(
+            s.x<-120 ||
+            s.x>WIDTH+120 ||
+            s.y<-120 ||
+            s.y>HEIGHT+120
+        ){
+            continue;
+        }
+
+        const pulse=
+            Math.sin(
+                worldTime*4+
+                enemy.phase
+            )*2;
+
+        let color;
+
+        if(enemy.type===4){
+            color="#d35cff";
+        }
+        else if(enemy.type===3){
+            color="#ff607b";
+        }
+        else if(enemy.type===2){
+            color="#ff9b57";
+        }
+        else if(enemy.type===1){
+            color="#b56dff";
+        }
+        else{
+            color="#68d2ff";
+        }
+
+        ctx.save();
+
+        ctx.translate(
+            s.x,
+            s.y
+        );
+
+        ctx.shadowBlur=
+            enemy.type===4
+            ?38
+            :18;
+
+        ctx.shadowColor=color;
+
+        ctx.fillStyle=
+            "rgba(5,9,16,.97)";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            enemy.radius+pulse,
+            0,
+            TAU
+        );
+
+        ctx.fill();
+
+        ctx.strokeStyle=color;
+
+        ctx.lineWidth=
+            enemy.type===4
+            ?4
+            :2;
+
+        ctx.beginPath();
+
+        for(let i=0;i<8;i++){
+
+            const a=
+                i*Math.PI/4;
+
+            const radius=
+                enemy.radius+
+                (i%2===0?9:0);
+
+            const x=
+                Math.cos(a)*
+                radius;
+
+            const y=
+                Math.sin(a)*
+                radius;
+
+            if(i===0){
+                ctx.moveTo(x,y);
+            }
+            else{
+                ctx.lineTo(x,y);
+            }
+
+        }
+
+        ctx.closePath();
+
+        ctx.stroke();
+
+        ctx.fillStyle=color;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            enemy.type===4?12:5,
+            0,
+            TAU
+        );
+
+        ctx.fill();
+
+        if(enemy.type===4){
+
+            ctx.strokeStyle=
+                "rgba(215,110,255,.45)";
+
+            ctx.lineWidth=7;
+
+            ctx.beginPath();
+
+            ctx.arc(
+                0,
+                0,
+                enemy.radius+
+                20+
+                Math.sin(
+                    worldTime*2
+                )*4,
+                0,
+                TAU
+            );
+
+            ctx.stroke();
+
+        }
+
+        ctx.restore();
+
+        if(enemy.health<enemy.maxHealth){
+
+            ctx.fillStyle="#070b11";
+
+            ctx.fillRect(
+                s.x-enemy.radius,
+                s.y-enemy.radius-12,
+                enemy.radius*2,
+                3
+            );
+
+            ctx.fillStyle="#df536d";
+
+            ctx.fillRect(
+                s.x-enemy.radius,
+                s.y-enemy.radius-12,
+                enemy.radius*2*
+                (enemy.health/enemy.maxHealth),
+                3
+            );
+
+        }
+
+    }
+
+}
+
+/* =========================================================
+   OTHER PLAYERS
+   ========================================================= */
+
+function drawOtherPlayers(){
+
+    for(
+        const [name,other]
+        of otherPlayers
+    ){
+
+        if(other.renderX===undefined){
+            continue;
+        }
+
+        const s=
+            worldToScreen(
+                other.renderX,
+                other.renderY
+            );
+
+        if(
+            s.x<-70 ||
+            s.x>WIDTH+70 ||
+            s.y<-70 ||
+            s.y>HEIGHT+70
+        ){
+            continue;
+        }
+
+        ctx.save();
+
+        ctx.translate(
+            s.x,
+            s.y
+        );
+
+        ctx.rotate(
+            other.angle||0
+        );
+
+        ctx.shadowBlur=20;
+        ctx.shadowColor="#ffd46b";
+
+        ctx.fillStyle="#1b2631";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            18,
+            0,
+            TAU
+        );
+
+        ctx.fill();
+
+        ctx.strokeStyle="#ffd46b";
+        ctx.lineWidth=2;
+        ctx.stroke();
+
+        ctx.fillStyle="#fff0b5";
+
+        ctx.beginPath();
+
+        ctx.moveTo(23,0);
+        ctx.lineTo(-9,-9);
+        ctx.lineTo(-5,0);
+        ctx.lineTo(-9,9);
+
+        ctx.closePath();
+
+        ctx.fill();
+
+        ctx.restore();
+
+        ctx.fillStyle="#f0d07c";
+
+        ctx.font="10px Arial";
+
+        ctx.textAlign="center";
+
+        ctx.fillText(
+            name,
+            s.x,
+            s.y-27
+        );
+
+    }
+
+}
+
+/* =========================================================
+   BULLETS
+   ========================================================= */
+
+function drawBullets(){
+
+    for(const bullet of bullets){
+
+        const s=
+            worldToScreen(
+                bullet.x,
+                bullet.y
+            );
+
+        const angle=
+            Math.atan2(
+                bullet.vy,
+                bullet.vx
+            );
+
+        ctx.save();
+
+        ctx.translate(
+            s.x,
+            s.y
+        );
+
+        ctx.rotate(angle);
+
+        ctx.shadowBlur=18;
+
+        ctx.shadowColor=
+            bullet.weapon===2
+            ?"#d18aff"
+            :"#61e9ff";
+
+        ctx.fillStyle=
+            bullet.weapon===2
+            ?"#e8b5ff"
+            :"#c5f7ff";
+
+        ctx.fillRect(
+            -14,
+            -2,
+            28,
+            4
+        );
+
+        ctx.restore();
+
+    }
+
+}
+
+/* =========================================================
+   DROPS
+   ========================================================= */
+
+function drawDrops(){
+
+    for(const drop of drops){
+
+        const s=
+            worldToScreen(
+                drop.x,
+                drop.y
+            );
+
+        const bob=
+            Math.sin(
+                worldTime*4+
+                drop.x
+            )*4;
+
+        ctx.save();
+
+        ctx.translate(
+            s.x,
+            s.y+bob
+        );
+
+        ctx.rotate(
+            Math.PI/4
+        );
+
+        ctx.shadowBlur=17;
+
+        ctx.shadowColor=
+            drop.type==="crystal"
+            ?"#bd70ff"
+            :"#a9bdc9";
+
+        ctx.fillStyle=
+            drop.type==="crystal"
+            ?"#b46cff"
+            :"#9eb1bf";
+
+        ctx.fillRect(
+            -6,
+            -6,
+            12,
+            12
+        );
+
+        ctx.restore();
+
+    }
+
+}
+
+/* =========================================================
+   PARTICLES
+   ========================================================= */
+
+function drawParticles(){
+
+    for(const part of particles){
+
+        const s=
+            worldToScreen(
+                part.x,
+                part.y
+            );
+
+        ctx.globalAlpha=
+            clamp(
+                part.life/part.maxLife,
+                0,
+                1
+            );
+
+        ctx.fillStyle=
+            part.type
+            ?"#b178ff"
+            :"#8ceaff";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            s.x,
+            s.y,
+            part.size,
+            0,
+            TAU
+        );
+
+        ctx.fill();
+
+    }
+
+    ctx.globalAlpha=1;
+
+}
+
+/* =========================================================
+   MINIMAP
+   ========================================================= */
+
+function drawMap(){
+
+    const width=190;
+    const height=190;
+
+    mapCtx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    mapCtx.fillStyle=
+        "rgba(3,7,13,.97)";
+
+    mapCtx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    mapCtx.strokeStyle=
+        "rgba(83,126,154,.18)";
+
+    for(
+        let x=10;
+        x<width;
+        x+=20
+    ){
+
+        mapCtx.beginPath();
+
+        mapCtx.moveTo(x,0);
+        mapCtx.lineTo(x,height);
+
+        mapCtx.stroke();
+
+    }
+
+    for(
+        let y=10;
+        y<height;
+        y+=20
+    ){
+
+        mapCtx.beginPath();
+
+        mapCtx.moveTo(0,y);
+        mapCtx.lineTo(width,y);
+
+        mapCtx.stroke();
+
+    }
+
+    const scale=
+        width/world.width;
+
+    mapCtx.strokeStyle=
+        "rgba(100,224,255,.4)";
+
+    mapCtx.beginPath();
+
+    mapCtx.arc(
+        4500*scale,
+        4500*scale,
+        420*scale,
+        0,
+        TAU
+    );
+
+    mapCtx.stroke();
+
+    /* OBSIDIAN ON MINIMAP */
+
+    mapCtx.fillStyle="#30264c";
+
+    for(const block of obsidianBlocks){
+
+        mapCtx.fillRect(
+            block.x*scale-1.5,
+            block.y*scale-1.5,
+            3,
+            3
+        );
+
+    }
+
+    /* CRYSTALS ON MINIMAP */
+
+    mapCtx.fillStyle="#d16cff";
+
+    for(const crystal of endCrystals){
+
+        mapCtx.beginPath();
+
+        mapCtx.arc(
+            crystal.x*scale,
+            crystal.y*scale,
+            3,
+            0,
+            TAU
+        );
+
+        mapCtx.fill();
+
+    }
+
+    for(const enemy of enemies){
+
+        if(enemy.dead){
+            continue;
+        }
+
+        mapCtx.fillStyle=
+            enemy.type===4
+            ?"#d45cff"
+            :"#d65772";
+
+        mapCtx.fillRect(
+            enemy.x*scale-1,
+            enemy.y*scale-1,
+            2,
+            2
+        );
+
+    }
+
+    for(
+        const [name,other]
+        of otherPlayers
+    ){
+
+        if(other.x===undefined){
+            continue;
+        }
+
+        mapCtx.fillStyle="#ffd46b";
+
+        mapCtx.fillRect(
+            other.x*scale-1.5,
+            other.y*scale-1.5,
+            3,
+            3
+        );
+
+    }
+
+    mapCtx.fillStyle="#9ff1ff";
+
+    mapCtx.shadowBlur=8;
+    mapCtx.shadowColor="#6de6ff";
+
+    mapCtx.beginPath();
+
+    mapCtx.arc(
+        player.x*scale,
+        player.y*scale,
+        3,
+        0,
+        TAU
+    );
+
+    mapCtx.fill();
+
+    mapCtx.shadowBlur=0;
+
+    mapCtx.strokeStyle="#385269";
+
+    mapCtx.strokeRect(
+        .5,
+        .5,
+        width-1,
+        height-1
+    );
+
+}
+
+/* =========================================================
+   UI
+   ========================================================= */
+
+function updateUI(){
+
+    document.querySelectorAll(".ansyes-only").forEach(slot=>{
+        slot.style.display=isAnsyes()?"":"none";
+    });
+
+    function percent(value,max){
+
+        return clamp(
+            value/max*100,
+            0,
+            100
+        );
+
+    }
+
+    document.querySelector(
+        ".hp i"
+    ).style.width=
+        percent(
+            player.health,
+            player.maxHealth
+        )+
+        "%";
+
+    document.querySelector(
+        ".sh i"
+    ).style.width=
+        percent(
+            player.shield,
+            player.maxShield
+        )+
+        "%";
+
+    document.querySelector(
+        ".en i"
+    ).style.width=
+        percent(
+            player.energy,
+            player.maxEnergy
+        )+
+        "%";
+
+    document.getElementById(
+        "money"
+    ).textContent=
+        "¢"+
+        Math.floor(player.money);
+
+    document.getElementById(
+        "level"
+    ).textContent=
+        "LV "+
+        player.level;
+
+    document.getElementById(
+        "xp"
+    ).textContent=
+        "XP "+
+        Math.floor(player.xp);
+
+    document.getElementById(
+        "kills"
+    ).textContent=
+        "KILLS "+
+        player.kills;
+
+    document.getElementById(
+        "score"
+    ).textContent=
+        "SCORE "+
+        player.score;
+
+    document.getElementById(
+        "wave"
+    ).textContent=
+        "WAVE "+
+        player.wave;
+
+    document.querySelectorAll(
+        ".slot"
+    ).forEach(
+        (slot,index)=>{
+
+            slot.classList.toggle(
+                "active",
+                index===player.selectedSlot
+            );
+
+        }
+    );
+
+    document.getElementById(
+        "questProgress"
+    ).textContent=
+        "Progress: "+
+        Math.min(player.kills,15)+
+        "/15";
+
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+function showToast(text){
+
+    const toast=
+        document.getElementById(
+            "toast"
+        );
+
+    toast.textContent=text;
+
+    toast.style.opacity="1";
+
+    clearTimeout(
+        showToast.timer
+    );
+
+    showToast.timer=
+        setTimeout(
+            ()=>{
+                toast.style.opacity="0";
+            },
+            1600
+        );
+
+}
+
+/* =========================================================
+   PANELS
+   ========================================================= */
+
+function closeAllPanels(){
+
+    document.querySelectorAll(
+        ".overlay"
+    ).forEach(
+        panel=>{
+            panel.style.display="none";
+        }
+    );
+
+    paused=false;
+
+}
+
+function togglePause(){
+
+    if(gameState!=="game"){
+        return;
+    }
+
+    paused=!paused;
+    VF_AUDIO.sfx('pause');
+
+    document.getElementById(
+        "pause"
+    ).style.display=
+        paused
+        ?"flex"
+        :"none";
+
+}
+
+function openInventory(){
+
+    const content=
+        document.getElementById(
+            "inventoryContent"
+        );
+
+    content.innerHTML="";
+
+    for(
+        const [item,amount]
+        of Object.entries(inventory)
+    ){
+
+        const row=
+            document.createElement("div");
+
+        row.className="row";
+
+        const shown=
+            amount===Infinity
+            ?"∞"
+            :amount;
+
+        row.innerHTML=
+            "<span>"+
+            item.toUpperCase()+
+            "</span>"+
+            "<b>"+
+            shown+
+            "</b>";
+
+        content.appendChild(row);
+
+    }
+
+    document.getElementById(
+        "inventory"
+    ).style.display="flex";
+
+}
+
+function openShop(){
+
+    VF_AUDIO.sfx('shop');
+    const content=
+        document.getElementById(
+            "shopContent"
+        );
+
+    content.innerHTML="";
+
+    const items=[
+
+        ["MEDKIT","medkit",30],
+
+        ["MAX HEALTH","health",120],
+
+        ["SHIELD","shield",140],
+
+        ["DAMAGE","damage",180],
+
+        ["SPEED","speed",160]
+
+    ];
+
+    items.forEach(
+        item=>{
+
+            const row=
+                document.createElement("div");
+
+            row.className="row";
+
+            row.innerHTML=
+                "<span>"+
+                item[0]+
+                " · ¢"+
+                item[2]+
+                "</span>"+
+                "<button class='button'>BUY</button>";
+
+            row.querySelector(
+                "button"
+            ).onclick=()=>{
+
+                if(
+                    player.money<
+                    item[2]
+                ){
+
+                    showToast(
+                        "NOT ENOUGH CREDITS"
+                    );
+
+                    return;
+
+                }
+
+                player.money-=item[2];
+
+                if(item[1]==="medkit"){
+
+                    inventory.medkit++;
+
+                }
+
+                else if(item[1]==="health"){
+
+                    upgrades.maxHealth++;
+
+                    player.maxHealth+=10;
+
+                    player.health=
+                        player.maxHealth;
+
+                }
+
+                else if(item[1]==="shield"){
+
+                    upgrades.shield++;
+
+                    player.maxShield+=8;
+
+                    player.shield=
+                        player.maxShield;
+
+                }
+
+                else if(item[1]==="damage"){
+
+                    upgrades.damage++;
+
+                }
+
+                else if(item[1]==="speed"){
+
+                    upgrades.speed++;
+
+                }
+
+                showToast(
+                    "UPGRADE PURCHASED"
+                );
+
+                saveGame();
+
+            };
+
+            content.appendChild(row);
+
+        }
+    );
+
+    document.getElementById(
+        "shop"
+    ).style.display="flex";
+
+}
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+
+addEventListener(
+    "keydown",
+    event=>{
+
+        keys[event.code]=true;
+
+        if(gameState!=="game"){
+            return;
+        }
+
+        if(
+            event.code==="KeyT"
+        ){
+
+            event.preventDefault();
+
+            openChat();
+
+        }
+
+        if(
+            event.code==="KeyG"
+        ){
+
+            event.preventDefault();
+
+            saveGame(true);
+
+        }
+
+        if(
+            event.code==="KeyI"
+        ){
+
+            openInventory();
+
+        }
+
+        if(
+            event.code==="KeyP"
+        ){
+
+            togglePause();
+
+        }
+
+        if(
+            event.code==="Escape"
+        ){
+
+            closeAllPanels();
+
+        }
+
+        /* WEAPON / ITEM HOTBAR */
+
+        if(event.code.startsWith("Digit")){
+
+            const number=Number(event.code.slice(5));
+
+            if(number>=1 && number<=7){
+
+                if(number<=2 && !isAnsyes()){
+                    showToast("ANYSYES ONLY");
+                    return;
+                }
+
+                player.selectedSlot=number-1;
+
+                if(number>=3){
+                    player.weapon=number-3;
+                }
+                else if(number===1){
+                    showToast("END CRYSTAL");
+                }
+                else if(number===2){
+                    showToast("OBSIDIAN");
+                }
+
+            }
+
+        }
+
+        if(
+            event.code==="KeyQ"
+        ){
+            event.preventDefault();
+            openShop();
+        }
+
+        if(
+            event.code==="KeyE"
+        ){
+            event.preventDefault();
+
+            const chest=nearestChest();
+            const rescue=nearestRescue();
+
+            if(chest || rescue){
+                interactWorld();
+            }
+            else if(inSafeZone()){
+                showToast(
+                    "SANCTUARY: FULL SYSTEM REGEN"
+                );
+            }
+            else if(
+                inventory.medkit>0 &&
+                player.health<
+                player.maxHealth
+            ){
+                inventory.medkit--;
+
+                player.health=
+                    Math.min(
+                        player.maxHealth,
+                        player.health+55
+                    );
+
+                showToast(
+                    "MEDKIT USED"
+                );
+            }
+        }
+
+    }
+);
+
+addEventListener(
+    "keyup",
+    event=>{
+        keys[event.code]=false;
+    }
+);
+
+/* =========================================================
+   MOUSE
+   ========================================================= */
+
+canvas.addEventListener(
+    "mousemove",
+    event=>{
+
+        mouse.x=event.clientX;
+        mouse.y=event.clientY;
+
+    }
+);
+
+canvas.addEventListener(
+    "mousedown",
+    event=>{
+
+        if(event.button===0){
+
+            mouse.down=true;
+
+            /*
+             * Crystal PvP items are click-based.
+             * Weapons are allowed to auto-fire.
+             */
+            attack();
+
+        }
+
+    }
+);
+
+addEventListener(
+    "mouseup",
+    event=>{
+
+        if(event.button===0){
+
+            mouse.down=false;
+
+        }
+
+    }
+);
+
+/* =========================================================
+   AUTOMATIC WEAPON FIRING
+   ========================================================= */
+
+setInterval(
+    ()=>{
+
+        if(
+            mouse.down &&
+            player.selectedSlot>=2
+        ){
+
+            attack();
+
+        }
+
+    },
+    30
+);
+
+/* =========================================================
+   AUTOSAVE
+   ========================================================= */
+
+setInterval(
+    ()=>saveGame(false),
+    10000
+);
+
+addEventListener(
+    "beforeunload",
+    ()=>{
+        saveGame(false);
+    }
+);
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+
+function render(){
+
+    ctx.save();
+
+    const shakeX=
+        (Math.random()-.5)*
+        shake;
+
+    const shakeY=
+        (Math.random()-.5)*
+        shake;
+
+    ctx.translate(
+        shakeX,
+        shakeY
+    );
+
+    drawBackground();
+    drawStars();
+    drawTerrain();
+    drawStructures();
+    drawWorldFeatures();
+    drawSafeZone();
+
+    /*
+     * Crystal PvP objects are drawn over
+     * the terrain but underneath entities.
+     */
+    drawObsidian();
+    drawEndCrystals();
+
+    drawDrops();
+    drawBullets();
+    drawEnemies();
+    drawOtherPlayers();
+    drawPlayer();
+    drawParticles();
+
+    ctx.restore();
+
+    drawWeather();
+
+    drawMap();
+    updateUI();
+
+    if(damageFlash>0){
+
+        ctx.fillStyle=
+            "rgba(255,35,65,"+
+            damageFlash*.45+
+            ")";
+
+        ctx.fillRect(
+            0,
+            0,
+            WIDTH,
+            HEIGHT
+        );
+
+    }
+
+}
+
+/* =========================================================
+   GAME LOOP
+   ========================================================= */
+
+function gameLoop(time){
+
+    const dt=
+        Math.min(
+            .035,
+            (time-lastTime)/1000
+        );
+
+    lastTime=time;
+
+    update(dt);
+    render();
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
+/* =========================================================
+   STARTUP
+   ========================================================= */
+
+async function hashPassword(text){
+
+    if(window.crypto && crypto.subtle){
+
+        const bytes=new TextEncoder().encode(text);
+
+        const digest=
+            await crypto.subtle.digest(
+                "SHA-256",
+                bytes
+            );
+
+        return Array.from(
+            new Uint8Array(digest)
+        )
+        .map(
+            b=>b.toString(16).padStart(2,"0")
+        )
+        .join("");
+
+    }
+
+    return btoa(
+        unescape(
+            encodeURIComponent(text)
+        )
+    );
+
+}
+
+async function startGame(){
+
+    VF_AUDIO.init();
+    VF_AUDIO.resume();
+    username=
+        document.getElementById(
+            "nameInput"
+        ).value.trim();
+
+    const password=
+        document.getElementById(
+            "passwordInput"
+        ).value;
+
+    if(
+        !/^[A-Za-z0-9_]{3,16}$/
+        .test(username)
+    ){
+
+        showToast(
+            "INVALID USERNAME"
+        );
+
+        return;
+
+    }
+
+    if(password.length<4){
+
+        showToast(
+            "PASSWORD MUST BE 4+ CHARACTERS"
+        );
+
+        return;
+
+    }
+
+    const key=
+        "voidfall.account."+
+        username.toLowerCase();
+
+    const stored=
+        localStorage.getItem(key);
+
+    const hash=
+        await hashPassword(password);
+
+    if(stored){
+
+        try{
+
+            const account=
+                JSON.parse(stored);
+
+            if(account.passwordHash!==hash){
+
+                showToast(
+                    "WRONG PASSWORD"
+                );
+
+                return;
+
+            }
+
+        }
+        catch{
+
+            localStorage.removeItem(key);
+
+        }
+
+    }
+    else{
+
+        localStorage.setItem(
+            key,
+            JSON.stringify({
+                username,
+                passwordHash:hash,
+                createdAt:Date.now()
+            })
+        );
+
+    }
+
+    document.getElementById(
+        "login"
+    ).style.display="none";
+
+    document.getElementById(
+        "hud"
+    ).style.display="block";
+
+    gameState="game";
+
+    connectServer();
+
+    showToast(
+        stored
+        ?"WELCOME BACK // "+username
+        :"ACCOUNT CREATED // WELCOME"
+    );
+
+}
+
+document.getElementById(
+    "joinButton"
+).onclick=startGame;
+
+document.getElementById(
+    "nameInput"
+).addEventListener(
+    "keydown",
+    event=>{
+
+        if(event.key==="Enter"){
+            startGame();
+        }
+
+    }
+);
+
+document.getElementById(
+    "passwordInput"
+).addEventListener(
+    "keydown",
+    event=>{
+
+        if(event.key==="Enter"){
+            startGame();
+        }
+
+    }
+);
+
+setTimeout(
+    ()=>{
+
+        document.getElementById(
+            "boot"
+        ).style.display="none";
+
+        document.getElementById(
+            "login"
+        ).style.display="flex";
+
+        document.getElementById(
+            "nameInput"
+        ).focus();
+
+    },
+    2100
+);
+
+requestAnimationFrame(
+    gameLoop
+);
+
+</script>
+
+</body>
+</html>
